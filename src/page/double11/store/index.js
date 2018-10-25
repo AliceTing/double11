@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-//查询购物车
-import realTimeModule from './realTimeModule';
+import double11Module from './double11Module';
 
 Vue.use(Vuex);
 
@@ -12,7 +11,7 @@ const vueInstance = new Vuex.Store({
   actions: {},
   mutations: {},
   modules: {
-
+      double11Module
   }
 });
 

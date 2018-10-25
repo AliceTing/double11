@@ -4,7 +4,7 @@ import {setTitle} from 'Public/util';
 
 Vue.use(VueRouter);
 
-const realTime = r => require.ensure([], () => r(require('../realTime.vue')), 'realTime');
+const realTime = r => require.ensure([], () => r(require('../double11.vue')), 'realTime');
 
 const router = new VueRouter({
     routes: [{

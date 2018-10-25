@@ -1,6 +1,4 @@
 <style lang="scss" scoped>
-    /*@import '../../public/assets/scss/mix.scss';*/
-
     html,
     body {
         height: 100%;
@@ -8,6 +6,7 @@
 
     .container {
         height: 100%;
+        -webkit-box-sizing: border-box;
         box-sizing: border-box;
         .wrap {
             float: left;
@@ -19,7 +18,10 @@
         }
         .middle{
             width: 40%;
-            background-color: #fafafa;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            border-left: solid 1px #ddd;
+            border-right: solid 1px #ddd;
         }
         .chart {
             width: 100%;
@@ -97,11 +99,10 @@
                 <div class="item orders">订单数：1034</div>
                 <div class="item univalence">客单价：80</div>
             </div>
-            <div>地图图</div>
+            <div id="main4" :style="{height: setSingleHeight*3/2 + 'px'}"></div>
             <div class="data_md deal_order">
                 <h2 class="name">成交订单</h2>
-                <div class="con">
-                </div>
+                <div class="con">heatMapOrderArr：{{heatMapOrderArr}}}</div>
             </div>
         </div>
         <div class="wrap right">
@@ -129,7 +130,10 @@
 
 <script>
     import Vue from 'vue';
+    import {mapState, mapActions, mapMutations} from 'vuex';
+
     import echarts from 'echarts';
+    import 'echarts/map/js/china.js';
 
     export default {
         data() {
@@ -157,6 +161,7 @@
             me.orderStatisticsChart();
             me.newOldRatioChart();
             me.salesStatisticsChart();
+            me.orderHeatChart();
         },
         methods: {
             // 实时时钟显示
@@ -182,11 +187,20 @@
             businessRankingChart(){
                 let me = this;
                 me.initChart(document.getElementById('main1'),{
+                    color:["#f00","#c60"],
                     title: {
                         text: "营业排行",
                         textStyle: {
                             fontSize: 20
                         }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: "axis",
+                        axisPointer: {
+                            type: "shadow"
+                        },
+                        backgroundColor:"#f60",
                     },
                     legend: {
                         data: [
@@ -210,6 +224,9 @@
                         {
                             name: "达成率",
                             type: "line",
+                            lineStyle:{
+                                color:"#fff000"
+                            },
                             data: [
                                 11, 8, 12, 9
                             ],
@@ -218,6 +235,7 @@
                         {
                             name: "actual",
                             type: "bar",
+                            barGap:"2%",
                             data: [
                                 10, 8, 12, 14
                             ]
@@ -243,6 +261,7 @@
                         }
                     },
                     tooltip: {
+                        show:true,
                         trigger: "item",
                         formatter: "{b}:{c}({d}%)"
                     },
@@ -315,6 +334,10 @@
                             fontSize: 20
                         }
                     },
+                        tooltip: {
+                            show: true,
+                            trigger: "axis"
+                        },
                     xAxis: [
                         {
                             type: "category",
@@ -345,6 +368,18 @@
                             type: "line",
                             smooth: true,
                             stack: "总量",
+
+                            areaStyle: {
+                                normal: {
+                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 0.5, [{
+                                        offset: 0,
+                                        color: '#8ec6ad'
+                                    }, {
+                                        offset: 1,
+                                        color: '#ffe'
+                                    }])
+                                }
+                            },
                             itemStyle: {
                                 normal: {
                                     areaStyle: {
@@ -463,6 +498,10 @@
                             fontSize: 20
                         }
                     },
+                    tooltip: {
+                        show: true,
+                        trigger: "axis",
+                    },
                     legend: {
                         orient: "horizontal",
                         x: "center",
@@ -530,6 +569,189 @@
                     ]
                 });
             },
+            // 订单热力图
+            orderHeatChart(){
+                let me = this;
+                me.initChart(document.getElementById('main4'),{
+                    title: {
+                        text: "订单热力图",
+                        textStyle: {
+                            fontSize: 20
+                        }
+                    },
+                    tooltip: {
+                        trigger: "item"
+                    },
+                    visualMap: {
+                        min: 0,
+                        max: 2500,
+                        x: "left",
+                        y: "bottom",
+                        text: [
+                            "高",
+                            "低"
+                        ],
+                        calculable: true
+                    },
+                    series: [
+                        {
+                            name: "订单",
+                            type: "map",
+                            map: "china",
+                            itemStyle: {
+                                normal: {
+                                    label: {
+                                        show: true
+                                    }
+                                },
+                                emphasis: {
+                                    label: {
+                                        show: true
+                                    }
+                                }
+                            },
+                            data: [
+                                {
+                                    name: "北京",
+                                    value: 234
+                                },
+                                {
+                                    "name": "天津",
+                                    "value": 532
+                                },
+                                {
+                                    "name": "上海",
+                                    "value": 134
+                                },
+                                {
+                                    "name": "重庆",
+                                    "value": 983
+                                },
+                                {
+                                    "name": "河北",
+                                    "value": 783
+                                },
+                                {
+                                    "name": "河南",
+                                    "value": 345
+                                },
+                                {
+                                    "name": "云南",
+                                    "value": 872
+                                },
+                                {
+                                    "name": "辽宁",
+                                    "value": 94
+                                },
+                                {
+                                    "name": "黑龙江",
+                                    "value": 342
+                                },
+                                {
+                                    "name": "湖南",
+                                    "value": 989
+                                },
+                                {
+                                    "name": "安徽",
+                                    "value": 767
+                                },
+                                {
+                                    "name": "山东",
+                                    "value": 675
+                                },
+                                {
+                                    "name": "新疆",
+                                    "value": 874
+                                },
+                                {
+                                    "name": "江苏",
+                                    "value": 874
+                                },
+                                {
+                                    "name": "浙江",
+                                    "value": 878
+                                },
+                                {
+                                    "name": "江西",
+                                    "value": 928
+                                },
+                                {
+                                    "name": "湖北",
+                                    "value": 44
+                                },
+                                {
+                                    "name": "广西",
+                                    "value": 448
+                                },
+                                {
+                                    "name": "甘肃",
+                                    "value": 887
+                                },
+                                {
+                                    "name": "山西",
+                                    "value": 903
+                                },
+                                {
+                                    "name": "内蒙古",
+                                    "value": 673
+                                },
+                                {
+                                    "name": "陕西",
+                                    "value": 563
+                                },
+                                {
+                                    "name": "吉林",
+                                    "value": 747
+                                },
+                                {
+                                    "name": "福建",
+                                    "value": 112
+                                },
+                                {
+                                    "name": "贵州",
+                                    "value": 473
+                                },
+                                {
+                                    "name": "广东",
+                                    "value": 647
+                                },
+                                {
+                                    "name": "青海",
+                                    "value": 838
+                                },
+                                {
+                                    "name": "西藏",
+                                    "value": 626
+                                },
+                                {
+                                    "name": "四川",
+                                    "value": 515
+                                },
+                                {
+                                    "name": "宁夏",
+                                    "value": 172
+                                },
+                                {
+                                    "name": "海南",
+                                    "value": 77
+                                },
+                                {
+                                    "name": "台湾",
+                                    "value": 837
+                                },
+                                {
+                                    "name": "香港",
+                                    "value": 677
+                                },
+                                {
+                                    "name": "澳门",
+                                    "value": 43
+                                }
+                            ]
+                        }
+                    ]
+                });
+            },
             // 初始化图表
             initChart(el, opts){
                 if(el){
@@ -539,6 +761,9 @@
             }
         },
         computed: {
+            ...mapState({
+                heatMapOrderArr: state => state.double11Module.heatMapOrderArr
+            }),
             setSingleHeight() {
                 let singleHeight = parseInt(window.innerHeight / 3);
                 return singleHeight;
