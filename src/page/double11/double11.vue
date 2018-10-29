@@ -1,8 +1,4 @@
 <style lang="scss" scoped>
-    html,
-    body {
-        height: 100%;
-    }
 
     .container {
         height: 100%;
@@ -13,15 +9,20 @@
             height: 100%;
         }
         .left,
-        .right{
+        .right {
             width: 30%;
         }
-        .middle{
+        .middle {
             width: 40%;
-            -webkit-box-sizing: border-box;
             box-sizing: border-box;
-            border-left: solid 1px #ddd;
-            border-right: solid 1px #ddd;
+        }
+        .left .inner,
+        .right .inner{
+            margin: 90px 40px 60px;
+            box-sizing: border-box;
+            border: solid 1px rgba(60, 46, 213, .54);
+            background-color: rgba(60, 46, 213, .14);
+            border-radius: 10px;
         }
         .chart {
             width: 100%;
@@ -31,39 +32,105 @@
         }
         .title,
         .real_time,
-        .total_price{
+        .total_price {
             text-align: center;
         }
-        .title{
-            font-size: 40px;
+        .title {
+            margin: 20px auto;
+            background: url("../../public/assets/images/title.png") no-repeat center top;
+            background-size: 697px 197px;
+            .real_time {
+                padding-top: 60px;
+                color: #fff;
+                font-size: 40px;
+            }
         }
-        .real_time{
-            font-size: 38px;
+        .total_price {
+            color: #FFFF6B;
+            font-size: 80px;
+            font-weight: 500;
         }
-        .total_price{
-            color: #f00;
-            font-size: 46px;
-        }
-        .detail_info{
+        .detail_info {
             display: flex;
             justify-content: space-between;
             font-size: 16px;
-            .item{
-                margin: 0 10px;
+            .item {
+                flex: 1;
+                text-align: center;
+            }
+            .key {
+                color: #fff;
+                font-size: 22px;
+            }
+            .value {
+                color: #FFFF6B;
+                font-size: 40px;
             }
         }
-        .data_md{
-            .name{
-                font-size: 20px;
+        .data_md {
+            box-sizing: border-box;
+            .name {
+                height: 30px;
+                padding-left: 20px;
+                color: #78B7FF;
+                font-size: 22px;
+                line-height: 30px;
+                &:before {
+                    content: '';
+                    display: inline-block;
+                    width: 10px;
+                    height: 16px;
+                    margin-right: 18px;
+                    border-radius: 8px;
+                    background-color: #78B7FF;
+                }
+            }
+            &.deal_order {
+                position: relative;
+                height: 185px;
+                padding: 20px 40px;
+                border: solid 1px rgba(60, 46, 213, .54);
+                background-color: rgba(60, 46, 213, .14);
+                color: #DCE2E9;
+                font-size: 22px;
+                .name {
+                    margin-bottom: 15px;
+                    padding-left: 0;
+                }
+                .item {
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 12px 0;
+                    font-size: 22px;
+                    line-height: 30px;
+                    .user {
+                        flex: 1;
+                    }
+                    .store {
+                        flex: 2;
+                    }
+                    .amount {
+                        flex: 1;
+                    }
+                }
+                .bottom_blur {
+                    position: absolute;
+                    bottom: 0;
+                    left: 20px;
+                    right: 20px;
+                    z-index: 5;
+                    height: 60px;
+                    background: linear-gradient(transparent, #18115b);
+                }
             }
         }
-        .goal_reach{
+        .goal_reach {
             display: flex;
             justify-content: space-around;
-            .box{
+            .box {
                 flex: 1;
                 align-items: center;
-                .rate{
+                .rate {
                     margin: auto;
                     border-radius: 50%;
                     background-color: #fc0;
@@ -71,7 +138,7 @@
                     font-size: 40px;
                     text-align: center;
                 }
-                .data{
+                .data {
                     display: flex;
                     flex-direction: column;
                     justify-content: flex-start;
@@ -84,46 +151,89 @@
     }
 </style>
 
+<style lang="scss">
+    html,
+    body {
+        height: 100%;
+        background-color: #16084b;
+    }
+</style>
+
 <template>
     <div class="container">
 
         <div class="wrap left">
-            <div class="chart" v-for="(item,index) in 3" :key="index" :id="'main'+(index+1)" :style="{height: setSingleHeight + 'px'}"></div>
-        </div>
-        <div class="wrap middle">
-            <!--<h1 class="title">来伊份双11大促</h1>-->
-            <div class="real_time">{{realTime}}</div>
-            <div class="total_price">￥ {{totalPrice | parseFormatNum}}</div>
-            <div class="detail_info clearfix">
-                <div class="item customers">客户数：{{customers}}</div>
-                <div class="item orders">订单数：1034</div>
-                <div class="item univalence">客单价：80</div>
-            </div>
-            <div id="main4" :style="{height: setSingleHeight*3/2 + 'px'}"></div>
-            <div class="data_md deal_order">
-                <h2 class="name">成交订单</h2>
-                <div class="con">heatMapOrderArr：{{heatMapOrderArr}}}</div>
-            </div>
-        </div>
-        <div class="wrap right">
-            <div class="data_md deal_order" :style="{height: setSingleHeight + 'px'}">
-                <h2 class="name">目标达成</h2>
-                <div class="con">
-                    <div class="goal_reach">
-                        <div class="box">
-                            <div class="rate" :style="{width: setSingleHeight*4/5 + 'px',height: setSingleHeight*4/5 + 'px', lineHeight: setSingleHeight*4/5 + 'px'}">{{goldReach.occuRate}}</div>
-                        </div>
-                        <div class="box">
-                            <ul class="data">
-                                <li>目标：{{goldReach.target}}</li>
-                                <li>当前：{{goldReach.atPresent}}</li>
-                                <li>同比增长：{{goldReach.increaseRate}}</li>
-                            </ul>
+            <div class="inner">
+                <div class="data_md" :style="{height: setSingleHeight + 'px'}">
+                    <h2 class="name">目标达成率</h2>
+                    <div class="con">
+                        <div class="goal_reach">
+                            <div class="box">
+                                <div class="rate"
+                                     :style="{width: setSingleHeight*4/5 + 'px',height: setSingleHeight*4/5 + 'px', lineHeight: setSingleHeight*4/5 + 'px'}">
+                                    {{goldReach.occuRate}}
+                                </div>
+                            </div>
+                            <div class="box">
+                                <ul class="data">
+                                    <li>目标：{{goldReach.target}}</li>
+                                    <li>当前：{{goldReach.atPresent}}</li>
+                                    <li>同比增长：{{goldReach.increaseRate}}</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="data_md" v-for="(chartItem,index) in leftChartArr" :key="index" :style="{height: setSingleHeight + 'px'}">
+                    <h2 class="name">{{chartItem.name}}</h2>
+                    <div class="con">
+                        <div class="chart" :id="'main'+(index+1)"></div>
+                    </div>
+                </div>
             </div>
-            <div class="chart" v-for="(item,index) in 2" :key="index" :id="'main'+ (index + 5)" :style="{height: setSingleHeight + 'px'}"></div>
+        </div>
+        <div class="wrap middle">
+            <div class="title">
+                <div class="real_time">{{realTime}}</div>
+                <div class="total_price">￥{{totalPrice | parseFormatNum}}</div>
+            </div>
+            <div class="detail_info clearfix">
+                <div class="item customers">
+                    <div class="key">客户数</div>
+                    <div class="value">{{customers}}</div>
+                </div>
+                <div class="item orders">
+                    <div class="key">订单数</div>
+                    <div class="value">{{orderNumber}}</div>
+                </div>
+                <div class="item univalence">
+                    <div class="key">客单价</div>
+                    <div class="value">￥{{unitPrice}}</div>
+                </div>
+            </div>
+            <div id="main3" :style="{height: setSingleHeight*3/2 + 'px'}"></div>
+            <div class="data_md deal_order">
+                <h2 class="name">成交订单</h2>
+                <div class="con">
+                    <div class="item" v-for="(item,index) in heatMapOrderArr" :key="index">
+                        <div class="user">{{item.userName}}</div>
+                        <div class="store">{{item.store}}</div>
+                        <div class="amount">{{item.amount}}</div>
+                        <div class="time">{{item.time}}</div>
+                    </div>
+                </div>
+                <div class="bottom_blur"></div>
+            </div>
+        </div>
+        <div class="wrap right">
+            <div class="inner">
+                <div class="data_md" v-for="(chartItem,index) in rightChartArr" :key="index" :style="{height: setSingleHeight + 'px'}">
+                    <h2 class="name">{{chartItem.name}}</h2>
+                    <div class="con">
+                        <div class="chart" :id="'main'+(index+4)"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -141,18 +251,34 @@
                 realTime: '00:00:00',
                 customers: 11,
                 totalPrice: 10223333,
-                goldReach:{
+                orderNumber: 34859,
+                unitPrice: 80,
+                goldReach: {
                     occuRate: '80%',
                     target: '200000',
                     atPresent: '150000',
                     increaseRate: '15%'
-                }
+                },
+                leftChartArr: [{
+                    name: '营业排行榜'
+                }, {
+                    name: '订单实时统计'
+                }],
+                rightChartArr: [{
+                    'name': '会员等级占比'
+                }, {
+                    'name': '新老客占比'
+                }, {
+                    'name': '营业额实时统计'
+                }]
             }
         },
         created() {
             let me = this;
             // 实时时钟显示
             me.getRealTime();
+
+            me.getHeatMapOrderData();
         },
         mounted() {
             let me = this;
@@ -164,6 +290,9 @@
             me.orderHeatChart();
         },
         methods: {
+            ...mapActions([
+                'getHeatMapOrderData',
+            ]),
             // 实时时钟显示
             getRealTime() {
                 let me = this;
@@ -184,23 +313,17 @@
                 }
             },
             // 营业排行
-            businessRankingChart(){
+            businessRankingChart() {
                 let me = this;
-                me.initChart(document.getElementById('main1'),{
-                    color:["#f00","#c60"],
-                    title: {
-                        text: "营业排行",
-                        textStyle: {
-                            fontSize: 20
-                        }
-                    },
+                me.initChart(document.getElementById('main1'), {
+                    color: [ "#79017d","#259bbe"],
                     tooltip: {
                         show: true,
                         trigger: "axis",
                         axisPointer: {
                             type: "shadow"
                         },
-                        backgroundColor:"#f60",
+                        backgroundColor: "#f60",
                     },
                     legend: {
                         data: [
@@ -212,7 +335,7 @@
                     xAxis: [
                         {
                             type: "category",
-                            data: ["上海分公司", "杭州分公司", "江苏分公司", "河南分公司"]
+                            data: ["上海分公司", "杭州分公司", "江苏分公司", "河南分公司","上海分公司", "杭州分公司"]
                         }
                     ],
                     yAxis: [
@@ -224,120 +347,40 @@
                         {
                             name: "达成率",
                             type: "line",
-                            lineStyle:{
-                                color:"#fff000"
+                            lineStyle: {
+                                color: "#fff000"
                             },
                             data: [
-                                11, 8, 12, 9
+                                11, 8, 12, 9,11, 8
                             ],
                             smooth: true
                         },
                         {
                             name: "actual",
                             type: "bar",
-                            barGap:"2%",
+                            barGap:"6",
                             data: [
-                                10, 8, 12, 14
+                                10, 8, 12, 14,11, 8
                             ]
                         },
                         {
                             name: "target",
                             type: "bar",
                             data: [
-                                12, 8, 10, 18
-                            ]
-                        }
-                    ]
-                });
-            },
-            // vip分布
-            vipDistributionChart(){
-                let me = this;
-                me.initChart(document.getElementById('main2'),{
-                    title: {
-                        text: "会员等级占比",
-                        textStyle: {
-                            fontSize: 20
-                        }
-                    },
-                    tooltip: {
-                        show:true,
-                        trigger: "item",
-                        formatter: "{b}:{c}({d}%)"
-                    },
-                    legend: {
-                        orient: "horizontal",
-                        x: "center",
-                        y: "bottom"
-                    },
-                    series: [
-                        {
-                            type: "pie",
-                            selectedMode:"multiple",
-                            radius: [
-                                "50%",
-                                "70%"
-                            ],
-                            itemStyle: {
-                                normal: {
-                                    label: {
-                                        show: true,
-                                        formatter: "{b}{d}%",
-                                        position: "outside"
-                                    },
-                                    labelLine: {
-                                        show: true
-                                    }
-                                }
-                            },
-                            data: [
-                                {
-                                    "value": 335,
-                                    "name": "非会员"
-                                },
-                                {
-                                    "value": 310,
-                                    "name": "VIP1"
-                                },
-                                {
-                                    "value": 234,
-                                    "name": "VIP2"
-                                },
-                                {
-                                    "value": 160,
-                                    "name": "VIP3"
-                                },
-                                {
-                                    "value": 138,
-                                    "name": "VIP4"
-                                },
-                                {
-                                    "value": 100,
-                                    "name": "VIP5"
-                                },
-                                {
-                                    "value": 95,
-                                    "name": "VIP6"
-                                }
+                                12, 8, 10, 18,11, 8
                             ]
                         }
                     ]
                 });
             },
             // 订单实时统计
-            orderStatisticsChart(){
+            orderStatisticsChart() {
                 let me = this;
-                me.initChart(document.getElementById('main3'),{
-                    title: {
-                        text: "订单实时统计",
-                        textStyle: {
-                            fontSize: 20
-                        }
+                me.initChart(document.getElementById('main2'), {
+                    tooltip: {
+                        show: true,
+                        trigger: "axis"
                     },
-                        tooltip: {
-                            show: true,
-                            trigger: "axis"
-                        },
                     xAxis: [
                         {
                             type: "category",
@@ -430,16 +473,78 @@
                     ]
                 });
             },
-            // 新老客占比
-            newOldRatioChart(){
+            // vip分布
+            vipDistributionChart() {
                 let me = this;
-                me.initChart(document.getElementById('main5'),{
-                    title: {
-                        text: "新老客占比",
-                        textStyle: {
-                            fontSize: 20
-                        }
+                me.initChart(document.getElementById('main4'), {
+                    tooltip: {
+                        show: true,
+                        trigger: "item",
+                        formatter: "{b}:{c}({d}%)"
                     },
+                    legend: {
+                        orient: "horizontal",
+                        x: "center",
+                        y: "bottom"
+                    },
+                    series: [
+                        {
+                            type: "pie",
+                            selectedMode: "multiple",
+                            radius: [
+                                "50%",
+                                "70%"
+                            ],
+                            itemStyle: {
+                                normal: {
+                                    label: {
+                                        show: true,
+                                        formatter: "{b}{d}%",
+                                        position: "outside"
+                                    },
+                                    labelLine: {
+                                        show: true
+                                    }
+                                }
+                            },
+                            data: [
+                                {
+                                    "value": 335,
+                                    "name": "非会员"
+                                },
+                                {
+                                    "value": 310,
+                                    "name": "VIP1"
+                                },
+                                {
+                                    "value": 234,
+                                    "name": "VIP2"
+                                },
+                                {
+                                    "value": 160,
+                                    "name": "VIP3"
+                                },
+                                {
+                                    "value": 138,
+                                    "name": "VIP4"
+                                },
+                                {
+                                    "value": 100,
+                                    "name": "VIP5"
+                                },
+                                {
+                                    "value": 95,
+                                    "name": "VIP6"
+                                }
+                            ]
+                        }
+                    ]
+                });
+            },
+            // 新老客占比
+            newOldRatioChart() {
+                let me = this;
+                me.initChart(document.getElementById('main5'), {
                     tooltip: {
                         trigger: "item",
                         formatter: "{b}:{c}({d}%)",
@@ -489,15 +594,9 @@
                 });
             },
             // 营业额实时统计
-            salesStatisticsChart(){
+            salesStatisticsChart() {
                 let me = this;
-                me.initChart(document.getElementById('main6'),{
-                    title: {
-                        text: "营业额实时统计",
-                        textStyle: {
-                            fontSize: 20
-                        }
-                    },
+                me.initChart(document.getElementById('main6'), {
                     tooltip: {
                         show: true,
                         trigger: "axis",
@@ -570,15 +669,9 @@
                 });
             },
             // 订单热力图
-            orderHeatChart(){
+            orderHeatChart() {
                 let me = this;
-                me.initChart(document.getElementById('main4'),{
-                    title: {
-                        text: "订单热力图",
-                        textStyle: {
-                            fontSize: 20
-                        }
-                    },
+                me.initChart(document.getElementById('main3'), {
                     tooltip: {
                         trigger: "item"
                     },
@@ -753,8 +846,8 @@
                 });
             },
             // 初始化图表
-            initChart(el, opts){
-                if(el){
+            initChart(el, opts) {
+                if (el) {
                     let myChart = echarts.init(el);
                     myChart.setOption(opts);
                 }
@@ -765,7 +858,7 @@
                 heatMapOrderArr: state => state.double11Module.heatMapOrderArr
             }),
             setSingleHeight() {
-                let singleHeight = parseInt(window.innerHeight / 3);
+                let singleHeight = parseInt((window.innerHeight - 150) / 3);
                 return singleHeight;
             }
         }
