@@ -125,26 +125,60 @@
             }
         }
         .goal_reach {
-            display: flex;
-            justify-content: space-around;
+            margin-top: 30px;
             .box {
-                flex: 1;
-                align-items: center;
+                position: relative;
                 .rate {
-                    margin: auto;
-                    border-radius: 50%;
-                    background-color: #fc0;
+                    position: absolute;
+                    top: -54px;
+                    padding: 5px;
+                    border-radius: 5px;
+                    border: 2px #413389 solid;
+                    background-color: #3E24A7;
                     color: #fff;
-                    font-size: 40px;
+                    font-size: 30px;
                     text-align: center;
                 }
-                .data {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-start;
-                    align-items: center;
-                    font-size: 20px;
-                    line-height: 30px;
+                .bar{
+                    position: relative;
+                    width: 90%;
+                    margin: 0 auto;
+                    height: 40px;
+                    border: solid 2px #413389;
+                    background: linear-gradient(90deg, #009dc2, #7e5dd7);
+                    .linear{
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        right: 0;
+                        left: 0;
+                        background:repeating-linear-gradient(90deg, transparent, transparent 5px, #180a56 5px, #180a56 10px);
+                    }
+                    .cover{
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        right: 0;
+                        background-color: #180a56;
+                    }
+                }
+            }
+            .data {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 30px;
+                color: #61ABFF;
+                font-size: 20px;
+                line-height: 30px;
+                h4{
+                    font-weight: normal;
+                }
+                .value{
+                    font-size: 40px;
+                    .unit{
+                        font-size: 22px;
+                    }
                 }
             }
         }
@@ -169,18 +203,26 @@
                     <div class="con">
                         <div class="goal_reach">
                             <div class="box">
-                                <div class="rate"
-                                     :style="{width: setSingleHeight*4/5 + 'px',height: setSingleHeight*4/5 + 'px', lineHeight: setSingleHeight*4/5 + 'px'}">
-                                    {{goldReach.occuRate}}
+                                <div class="bar">
+                                    <div class="rate" :style="{left: goldReach.occuRate}">{{goldReach.occuRate}}</div>
+                                    <div class="linear"></div>
+                                    <div class="cover" :style="{width: (100 - goldReach.occuRate.substr(0,goldReach.occuRate.length-1)) + '%'}"></div>
                                 </div>
                             </div>
-                            <div class="box">
-                                <ul class="data">
-                                    <li>目标：{{goldReach.target}}</li>
-                                    <li>当前：{{goldReach.atPresent}}</li>
-                                    <li>同比增长：{{goldReach.increaseRate}}</li>
-                                </ul>
-                            </div>
+                            <ul class="data">
+                                <li>
+                                    <h4>目标</h4>
+                                    <div class="value">{{goldReach.target}}<span class="unit">万</span></div>
+                                </li>
+                                <li>
+                                    <h4>当前</h4>
+                                    <div class="value">{{goldReach.atPresent}}<span class="unit">万</span></div>
+                                </li>
+                                <li>
+                                    <h4>同比增长</h4>
+                                    <div class="value">{{goldReach.increaseRate.substr(0,goldReach.increaseRate.length - 1)}}<span class="unit">%</span></div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -254,7 +296,7 @@
                 orderNumber: 34859,
                 unitPrice: 80,
                 goldReach: {
-                    occuRate: '80%',
+                    occuRate: '90%',
                     target: '200000',
                     atPresent: '150000',
                     increaseRate: '15%'
@@ -316,7 +358,7 @@
             businessRankingChart() {
                 let me = this;
                 me.initChart(document.getElementById('main1'), {
-                    color: [ "#79017d","#259bbe"],
+                    color: [ "#009dc2","#7e5dd7"],
                     tooltip: {
                         show: true,
                         trigger: "axis",
@@ -358,7 +400,7 @@
                         {
                             name: "actual",
                             type: "bar",
-                            barGap:"6",
+                            barGap:"2",
                             data: [
                                 10, 8, 12, 14,11, 8
                             ]
@@ -377,6 +419,7 @@
             orderStatisticsChart() {
                 let me = this;
                 me.initChart(document.getElementById('main2'), {
+                    color: [ "#009dc2","#7e5dd7"],
                     tooltip: {
                         show: true,
                         trigger: "axis"
@@ -411,16 +454,15 @@
                             type: "line",
                             smooth: true,
                             stack: "总量",
-
                             areaStyle: {
                                 normal: {
-                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 0.5, [{
-                                        offset: 0,
-                                        color: '#8ec6ad'
-                                    }, {
-                                        offset: 1,
-                                        color: '#ffe'
-                                    }])
+                                    color: new echarts.graphic.LinearGradient(
+                                        0, 0, 0, 1,
+                                        [
+                                            {offset: 0, color: 'rgba(127,93,215,1)'},
+                                            {offset: 1, color: 'rgba(255,255,255,0)'}
+                                        ]
+                                    )
                                 }
                             },
                             itemStyle: {
@@ -434,7 +476,7 @@
                                 8,
                                 9,
                                 11,
-                                14,
+                                9,
                                 18,
                                 25,
                                 27,
@@ -449,6 +491,17 @@
                             type: "line",
                             smooth: true,
                             stack: "总量",
+                            areaStyle: {
+                                normal: {
+                                    color: new echarts.graphic.LinearGradient(
+                                        0, 0, 0, 1,
+                                        [
+                                            {offset: 0, color: 'rgba(0,157,194,1)'},
+                                            {offset: 1, color: 'rgba(255,255,255,0)'}
+                                        ]
+                                    )
+                                }
+                            },
                             itemStyle: {
                                 normal: {
                                     areaStyle: {
@@ -459,7 +512,7 @@
                             data: [
                                 2,
                                 4,
-                                5,
+                                50,
                                 6,
                                 9,
                                 12,
@@ -477,6 +530,7 @@
             vipDistributionChart() {
                 let me = this;
                 me.initChart(document.getElementById('main4'), {
+                    color: ["#009dc2","#7e5dd7","#5113b1","#4702fb","#0a84a1","#7b4cf4"],
                     tooltip: {
                         show: true,
                         trigger: "item",
@@ -531,10 +585,6 @@
                                 {
                                     "value": 100,
                                     "name": "VIP5"
-                                },
-                                {
-                                    "value": 95,
-                                    "name": "VIP6"
                                 }
                             ]
                         }
@@ -545,6 +595,7 @@
             newOldRatioChart() {
                 let me = this;
                 me.initChart(document.getElementById('main5'), {
+                    color: ["#009dc2","#7e5dd7","#5113b1"],
                     tooltip: {
                         trigger: "item",
                         formatter: "{b}:{c}({d}%)",
@@ -597,6 +648,7 @@
             salesStatisticsChart() {
                 let me = this;
                 me.initChart(document.getElementById('main6'), {
+                    color: [ "#009dc2","#7e5dd7"],
                     tooltip: {
                         show: true,
                         trigger: "axis",
