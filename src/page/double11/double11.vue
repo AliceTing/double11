@@ -17,8 +17,8 @@
             box-sizing: border-box;
         }
         .left .inner,
-        .right .inner{
-            margin: 90px 40px 60px;
+        .right .inner {
+            margin: 20px 40px 0;
             box-sizing: border-box;
             border: solid 1px rgba(60, 46, 213, .54);
             background-color: rgba(60, 46, 213, .14);
@@ -139,22 +139,22 @@
                     font-size: 30px;
                     text-align: center;
                 }
-                .bar{
+                .bar {
                     position: relative;
                     width: 90%;
                     margin: 0 auto;
                     height: 40px;
                     border: solid 2px #413389;
                     background: linear-gradient(90deg, #009dc2, #7e5dd7);
-                    .linear{
+                    .linear {
                         position: absolute;
                         top: 0;
                         bottom: 0;
                         right: 0;
                         left: 0;
-                        background:repeating-linear-gradient(90deg, transparent, transparent 5px, #180a56 5px, #180a56 10px);
+                        background: repeating-linear-gradient(90deg, transparent, transparent 5px, #180a56 5px, #180a56 10px);
                     }
-                    .cover{
+                    .cover {
                         position: absolute;
                         top: 0;
                         bottom: 0;
@@ -171,12 +171,12 @@
                 color: #61ABFF;
                 font-size: 20px;
                 line-height: 30px;
-                h4{
+                h4 {
                     font-weight: normal;
                 }
-                .value{
+                .value {
                     font-size: 40px;
-                    .unit{
+                    .unit {
                         font-size: 22px;
                     }
                 }
@@ -206,7 +206,8 @@
                                 <div class="bar">
                                     <div class="rate" :style="{left: goldReach.occuRate}">{{goldReach.occuRate}}</div>
                                     <div class="linear"></div>
-                                    <div class="cover" :style="{width: (100 - goldReach.occuRate.substr(0,goldReach.occuRate.length-1)) + '%'}"></div>
+                                    <div class="cover"
+                                         :style="{width: (100 - goldReach.occuRate.substr(0,goldReach.occuRate.length-1)) + '%'}"></div>
                                 </div>
                             </div>
                             <ul class="data">
@@ -220,16 +221,19 @@
                                 </li>
                                 <li>
                                     <h4>同比增长</h4>
-                                    <div class="value">{{goldReach.increaseRate.substr(0,goldReach.increaseRate.length - 1)}}<span class="unit">%</span></div>
+                                    <div class="value">{{goldReach.increaseRate.substr(0,goldReach.increaseRate.length -
+                                        1)}}<span class="unit">%</span></div>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div class="data_md" v-for="(chartItem,index) in leftChartArr" :key="index" :style="{height: setSingleHeight + 'px'}">
+                <div class="data_md" v-for="(chartItem,index) in leftChartArr" :key="index"
+                     :style="{height: setSingleHeight + 'px'}">
                     <h2 class="name">{{chartItem.name}}</h2>
                     <div class="con">
-                        <div class="chart" :id="'main'+(index+1)"></div>
+                        <div class="chart" :style="{height: (setSingleHeight - 50) + 'px'}"
+                             :id="'main'+(index+1)"></div>
                     </div>
                 </div>
             </div>
@@ -269,10 +273,12 @@
         </div>
         <div class="wrap right">
             <div class="inner">
-                <div class="data_md" v-for="(chartItem,index) in rightChartArr" :key="index" :style="{height: setSingleHeight + 'px'}">
+                <div class="data_md" v-for="(chartItem,index) in rightChartArr" :key="index"
+                     :style="{height: setSingleHeight + 'px'}">
                     <h2 class="name">{{chartItem.name}}</h2>
                     <div class="con">
-                        <div class="chart" :id="'main'+(index+4)"></div>
+                        <div class="chart" :style="{height: (setSingleHeight - 50) + 'px'}"
+                             :id="'main'+(index+4)"></div>
                     </div>
                 </div>
             </div>
@@ -321,6 +327,8 @@
             me.getRealTime();
 
             me.getHeatMapOrderData();
+            me.getVipRatioData();
+            me.getNewOldData();
         },
         mounted() {
             let me = this;
@@ -334,6 +342,8 @@
         methods: {
             ...mapActions([
                 'getHeatMapOrderData',
+                'getVipRatioData',
+                'getNewOldData'
             ]),
             // 实时时钟显示
             getRealTime() {
@@ -358,7 +368,7 @@
             businessRankingChart() {
                 let me = this;
                 me.initChart(document.getElementById('main1'), {
-                    color: [ "#009dc2","#7e5dd7"],
+                    color: ["#009dc2", "#7e5dd7"],
                     tooltip: {
                         show: true,
                         trigger: "axis",
@@ -368,7 +378,7 @@
                         backgroundColor: "#f60",
                     },
                     legend: {
-                        data: [
+                        data:[
                             "actual",
                             "target"
                         ],
@@ -376,41 +386,49 @@
                     },
                     xAxis: [
                         {
-                            type: "category",
-                            data: ["上海分公司", "杭州分公司", "江苏分公司", "河南分公司","上海分公司", "杭州分公司"]
+                            type: "category"
                         }
                     ],
                     yAxis: [
                         {
                             type: "value"
+                        },
+                        {
+                            type: "value",
+                            show: false
                         }
                     ],
+                    dataset: {
+                        source: me.convertLine()
+                    },
                     series: [
                         {
                             name: "达成率",
                             type: "line",
-                            lineStyle: {
-                                color: "#fff000"
+                            seriesLayoutBy: "row",
+                            yAxisIndex: 1,
+                            encode: {
+                                y: 3
                             },
-                            data: [
-                                11, 8, 12, 9,11, 8
-                            ],
                             smooth: true
                         },
                         {
                             name: "actual",
                             type: "bar",
-                            barGap:"2",
-                            data: [
-                                10, 8, 12, 14,11, 8
-                            ]
+                            seriesLayoutBy: "row",
+                            encode: {
+                                x: 0,
+                                y: "actual"
+                            }
                         },
                         {
                             name: "target",
                             type: "bar",
-                            data: [
-                                12, 8, 10, 18,11, 8
-                            ]
+                            seriesLayoutBy: "row",
+                            encode: {
+                                x: 0,
+                                y: "target"
+                            }
                         }
                     ]
                 });
@@ -419,7 +437,7 @@
             orderStatisticsChart() {
                 let me = this;
                 me.initChart(document.getElementById('main2'), {
-                    color: [ "#009dc2","#7e5dd7"],
+                    color: ["#009dc2", "#7e5dd7"],
                     tooltip: {
                         show: true,
                         trigger: "axis"
@@ -526,80 +544,63 @@
                     ]
                 });
             },
-            // vip分布
+            // vip分布/会员占比
             vipDistributionChart() {
                 let me = this;
-                me.initChart(document.getElementById('main4'), {
-                    color: ["#009dc2","#7e5dd7","#5113b1","#4702fb","#0a84a1","#7b4cf4"],
+                let opt = {
+                    color: ["#009dc2", "#7e5dd7", "#5113b1", "#4702fb", "#0a84a1", "#7b4cf4"],
                     tooltip: {
-                        show: true,
-                        trigger: "item",
-                        formatter: "{b}:{c}({d}%)"
+                        show: false,
+                        trigger: "item"
                     },
                     legend: {
                         orient: "horizontal",
                         x: "center",
                         y: "bottom"
                     },
-                    series: [
-                        {
-                            type: "pie",
-                            selectedMode: "multiple",
-                            radius: [
-                                "50%",
-                                "70%"
-                            ],
-                            itemStyle: {
-                                normal: {
-                                    label: {
-                                        show: true,
-                                        formatter: "{b}{d}%",
-                                        position: "outside"
-                                    },
-                                    labelLine: {
-                                        show: true
-                                    }
-                                }
+                    series: [{
+                        type: "pie",
+                        selectedMode: "multiple",
+                        radius: [
+                            "50%",
+                            "70%"
+                        ],
+                        label: {
+                            normal: {
+                                show: false,
+                                position: 'center'
                             },
-                            data: [
-                                {
-                                    "value": 335,
-                                    "name": "非会员"
-                                },
-                                {
-                                    "value": 310,
-                                    "name": "VIP1"
-                                },
-                                {
-                                    "value": 234,
-                                    "name": "VIP2"
-                                },
-                                {
-                                    "value": 160,
-                                    "name": "VIP3"
-                                },
-                                {
-                                    "value": 138,
-                                    "name": "VIP4"
-                                },
-                                {
-                                    "value": 100,
-                                    "name": "VIP5"
+                            emphasis: {
+                                show: true,
+                                formatter: "{b}:{d}%",
+                                textStyle: {
+                                    fontSize: '30',
+                                    fontWeight: 'bold'
                                 }
-                            ]
-                        }
+                            }
+                        },
+                        data: []
+                    }
                     ]
-                });
+                };
+                for (var prop in me.vipRatioObj) {
+                    opt.series[0].data.push({
+                        'value': parseFloat(me.vipRatioObj[prop]) * 100,
+                        'name': prop.substr(0, prop.length - 4)
+                    })
+                }
+                let chart = me.initChart(document.getElementById('main4'), opt);
+                me.pieIntervalShow(chart);
             },
             // 新老客占比
             newOldRatioChart() {
                 let me = this;
-                me.initChart(document.getElementById('main5'), {
-                    color: ["#009dc2","#7e5dd7","#5113b1"],
+                let opt = {
+                    color: ["#009dc2", "#7e5dd7", "#5113b1"],
                     tooltip: {
                         trigger: "item",
                         formatter: "{b}:{c}({d}%)",
-                        show: true
+                        show: false
                     },
                     legend: {
                         orient: "horizontal",
@@ -614,41 +615,43 @@
                                 "50%",
                                 "70%"
                             ],
-                            itemStyle: {
+                            label: {
                                 normal: {
-                                    label: {
-                                        show: true,
-                                        formatter: "{b}{d}%",
-                                        position: "outside"
-                                    },
-                                    labelLine: {
-                                        show: true
+                                    show: false,
+                                    position: 'center'
+                                },
+                                emphasis: {
+                                    show: true,
+                                    formatter: "{b}:{d}%",
+                                    textStyle: {
+                                        fontSize: '30',
+                                        fontWeight: 'bold'
                                     }
                                 }
                             },
-                            data: [
-                                {
-                                    "value": 335,
-                                    "name": "新会员"
-                                },
-                                {
-                                    "value": 310,
-                                    "name": "老会员"
-                                },
-                                {
-                                    "value": 364,
-                                    "name": "非会员"
-                                }
-                            ]
+                            data: []
                         }
                     ]
-                });
+                };
+                let nameMap = {
+                    'notVIPRate': '非会员',
+                    'newVIPRate': '新用户',
+                    'oldVIPRate': '老用户'
+                }
+                for (var prop in me.newOldObj) {
+                    opt.series[0].data.push({
+                        'value': parseFloat(me.newOldObj[prop]) * 100,
+                        'name': prop
+                    })
+                }
+                let chart = me.initChart(document.getElementById('main5'), opt);
+                me.pieIntervalShow(chart);
             },
             // 营业额实时统计
             salesStatisticsChart() {
                 let me = this;
                 me.initChart(document.getElementById('main6'), {
-                    color: [ "#009dc2","#7e5dd7"],
+                    color: ["#009dc2", "#7e5dd7"],
                     tooltip: {
                         show: true,
                         trigger: "axis",
@@ -898,19 +901,119 @@
                 });
             },
             // 初始化图表
-            initChart(el, opts) {
+            initChart(el, opts, type) {
                 if (el) {
                     let myChart = echarts.init(el);
                     myChart.setOption(opts);
+                    return myChart;
                 }
+            },
+            //环形图定时展示
+            pieIntervalShow(myChart) {
+                let currentIndex = -1;
+                setInterval(function () {
+                    var dataLen = myChart.getOption().series[0].data.length;
+                    // 取消之前高亮的图形
+                    myChart.dispatchAction({
+                        type: 'downplay',
+                        seriesIndex: 0,
+                        dataIndex: currentIndex
+                    });
+                    currentIndex = (currentIndex + 1) % dataLen;
+                    // 高亮当前图形
+                    myChart.dispatchAction({
+                        type: 'highlight',
+                        seriesIndex: 0,
+                        dataIndex: currentIndex
+                    });
+                    // 显示 tooltip
+                    myChart.dispatchAction({
+                        type: 'showTip',
+                        seriesIndex: 0,
+                        dataIndex: currentIndex
+                    });
+                }, 5000)
+            },
+            // 解析营业排行数据
+            convertLine() {
+                let lineData = {
+                    "code": 0,
+                    "message": "success",
+                    "result": {
+                        "target": [{
+                            "company": "上海子公司",
+                            "amount": "10000"
+                        }, {
+                            "company": "杭州分公司",
+                            "amount": "10000"
+                        }, {
+                            "company": "江苏分公司",
+                            "amount": "10000"
+                        }],
+                        "actual": [{
+                            "company": "上海子公司",
+                            "amount": "6000"
+                        }, {
+                            "company": "杭州分公司",
+                            "amount": "7000"
+                        }, {
+                            "company": "江苏分公司",
+                            "amount": "8000"
+                        }],
+                        "reachRate": [{
+                            "company": "上海子公司",
+                            "reachRate": "20.00%"
+                        }, {
+                            "company": "杭州分公司",
+                            "reachRate": "42.00%"
+                        }, {
+                            "company": "江苏分公司",
+                            "reachRate": "85.00%"
+                        }]
+                    },
+                    "succ": true
+                };
+                let source = [],
+                    company = [""],
+                    target = ["target"],
+                    actual = ["actual"],
+                    reachRate = [""],
+                    i = 0,
+                    len, data, val;
+
+                data = lineData.result.actual;
+                len = data.length;
+                for (; i < len; i++) {
+                    company.push(data[i]["company"]);
+                    actual.push(data[i]["amount"]);
+                }
+
+                data = lineData.result.target;
+                len = data.length;
+                i = 0;
+                for (; i < len; i++) {
+                    target.push(data[i]["amount"]);
+                }
+
+                data = lineData.result.reachRate;
+                len = data.length;
+                i = 0;
+                for (; i < len; i++) {
+                    val = data[i]["reachRate"];
+                    reachRate.push(val.substr(0, val.length - 1));
+                }
+
+                return [company, actual, target, reachRate];
             }
         },
         computed: {
             ...mapState({
-                heatMapOrderArr: state => state.double11Module.heatMapOrderArr
+                heatMapOrderArr: state => state.double11Module.heatMapOrderArr,
+                vipRatioObj: state => state.double11Module.vipRatioObj,
+                newOldObj: state => state.double11Module.newOldObj,
             }),
             setSingleHeight() {
-                let singleHeight = parseInt((window.innerHeight - 150) / 3);
+                let singleHeight = parseInt((window.innerHeight - 30) / 3);
                 return singleHeight;
             }
         }
