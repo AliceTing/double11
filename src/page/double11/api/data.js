@@ -184,14 +184,14 @@ export const businessRanking = {
 export const realTimeAmountLine = {
     "code": 0,
     "message": "success",
-    "result": {"7:40:00": "17484.48"},
+    "result": {"6:40:00": "17484.48","7:50:00": "12484.48","5:40:00": "17184.48","4:50:00": "12984.48"},
     "succ": true
 }
 
 export const realTimeOrderNumLine = {
     "code": 0,
     "message": "success",
-    "result": {"7:40:00": "288"},
+    "result": {"6:40:00": "288","7:50:00": "100","5:40:00": "140","4:50:00": "200"},
     "succ": true
 }
 

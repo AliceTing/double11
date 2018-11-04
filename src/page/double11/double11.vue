@@ -197,7 +197,6 @@
 
 <template>
     <div class="container">
-
         <div class="wrap left">
             <div class="inner">
                 <div class="data_md" :style="{height: setSingleHeight + 'px'}">
@@ -263,7 +262,7 @@
             <div class="data_md deal_order">
                 <h2 class="name">成交订单</h2>
                 <div class="con">
-                    <div class="item" v-for="(item,index) in heatMapOrderArr" :key="index">
+                    <div class="item" v-for="(item,index) in transactionOrder" :key="index">
                         <div class="user">{{item.userName}}</div>
                         <div class="store">{{item.store}}</div>
                         <div class="amount">{{item.amount}}</div>
@@ -320,7 +319,8 @@
                     'name': '新老客占比'
                 }, {
                     'name': '营业额实时统计'
-                }]
+                }],
+                refreshTime:5
             }
         },
         created() {
@@ -328,13 +328,12 @@
             // 实时时钟显示
             me.getRealTime();
 
-            // me.getHeatMapOrderData();
-            // me.getVipRatioData();
-            // me.getNewOldData();
-
+            me.getBusinessRanking();
+            me.getOrderMap();
+            me.getTransactionOrder();
             me.getMember();
-
-            // me.getClubCardInfo();
+            me.getRealTimeOrderNumLine();
+            me.getRealTimeAmountLine();
 
         },
         mounted() {
@@ -345,14 +344,19 @@
             me.newOldRatioChart();
             me.salesStatisticsChart();
             me.orderHeatChart();
+
+            me.intervalData();
         },
         methods: {
             ...mapActions([
-                'getHeatMapOrderData',
-                'getVipRatioData',
-                'getNewOldData',
+                'getTransactionOrder',
                 'getMember',
-                'getClubCardInfo'
+                'getOrderMap',
+                'getTargetComplete',
+                'getMainTitle',
+                'getRealTimeOrderNumLine',
+                'getRealTimeAmountLine',
+                'getBusinessRanking'
             ]),
             // 实时时钟显示
             getRealTime() {
@@ -424,9 +428,6 @@
                             show: false
                         }
                     ],
-                    dataset: {
-                        source: []
-                    },
                     series: [
                         {
                             name: "达成率",
@@ -478,15 +479,12 @@
                     legend: {
                         data: [
                             "今日订单",
-                            "昨日订单"
+                            //"昨日订单"
                         ],
                         y: "bottom",
                         textStyle: {
                             color: '#3D3E86'
                         }
-                    },
-                    dataset: {
-                        source: []
                     },
                     series: [
                         {
@@ -500,29 +498,36 @@
                                     }
                                 }
                             },
-                            seriesLayoutBy: "row"
-                        },
-                        {
-                            name: "昨日订单",
-                            type: "line",
-                            smooth: true,
-                            itemStyle: {
+                            seriesLayoutBy: "row",
+                            areaStyle: {
                                 normal: {
-                                    areaStyle: {
-                                        type: "default"
-                                    }
+                                    color: new echarts.graphic.LinearGradient(
+                                        0, 0, 0, 1,
+                                        [
+                                            {offset: 0, color: 'rgba(127,93,215,1)'},
+                                            {offset: 1, color: 'rgba(255,255,255,0)'}
+                                        ]
+                                    )
                                 }
                             },
-                            seriesLayoutBy: "row"
-                        }
+                        },
+                        // {
+                        //     name: "昨日订单",
+                        //     type: "line",
+                        //     smooth: true,
+                        //     itemStyle: {
+                        //         normal: {
+                        //             areaStyle: {
+                        //                 type: "default"
+                        //             }
+                        //         }
+                        //     },
+                        //     seriesLayoutBy: "row"
+                        // }
                     ]
                 };
-                let chart = me.initChart(document.getElementById('main2'), opt);
-                chart.dispatchAction({
-                    type: 'showTip',
-                    seriesIndex: 0,
-                    dataIndex: chart.getOption().dataset[0].source[0].length - 2
-                });
+                me.initChart(document.getElementById('main2'), opt);
+
             },
             // vip分布/会员占比
             vipDistributionChart() {
@@ -566,14 +571,8 @@
                     }
                     ]
                 };
-                for (var prop in me.vipRatioObj) {
-                    opt.series[0].data.push({
-                        'value': parseFloat(me.vipRatioObj[prop]) * 100,
-                        'name': prop.substr(0, prop.length - 4)
-                    })
-                }
-                let chart = me.initChart(document.getElementById('main4'), opt);
-                me.pieIntervalShow(chart);
+                me.initChart(document.getElementById('main4'), opt);
+
             },
             // 新老客占比
             newOldRatioChart() {
@@ -619,21 +618,8 @@
                         }
                     ]
                 };
-                let nameMap = {
-                    'notVIPRate': '非会员',
-                    'newVIPRate': '新用户',
-                    'oldVIPRate': '老用户'
-                };
 
-                // Object
-                for (var prop in me.newOldObj) {
-                    opt.series[0].data.push({
-                        'value': parseFloat(me.newOldObj[prop]) * 100,
-                        'name': prop
-                    })
-                }
-                let chart = me.initChart(document.getElementById('main5'), opt);
-                me.pieIntervalShow(chart);
+                me.initChart(document.getElementById('main5'), opt);
             },
             // 营业额实时统计
             salesStatisticsChart() {
@@ -654,37 +640,34 @@
                     legend: {
                         data: [
                             "now",
-                            "lastyear"
+                            //"lastyear"
                         ],
                         y: "bottom",
                         textStyle: {
                             color: '#3D3E86'
                         }
                     },
-                    dataset: {
-                        source:[]
-                    },
                     series: [
                         {
                             name: "now",
                             type: "line",
                             smooth: true,
-                            seriesLayoutBy: "row"
+                            seriesLayoutBy: "row",
+                            encode:{
+                                x:0,
+                                y:1
+                            }
                         },
-                        {
-                            name: "lastyear",
-                            type: "line",
-                            smooth: true,
-                            seriesLayoutBy: "row"
-                        }
+                        // {
+                        //     name: "lastyear",
+                        //     type: "line",
+                        //     smooth: true,
+                        //     seriesLayoutBy: "row"
+                        // }
                     ]
                 };
-                let chart = me.initChart(document.getElementById('main6'), opt);
-                chart.dispatchAction({
-                    type: 'showTip',
-                    seriesIndex: 0,
-                    dataIndex: chart.getOption().dataset[0].source[0].length - 2
-                });
+                me.initChart(document.getElementById('main6'), opt);
+
             },
             // 订单热力图
             orderHeatChart() {
@@ -693,10 +676,10 @@
                     geo: {
                         map: "china",
                         label: {
-                            show: true,
-                            fontSize:10
+                            //show: true,
+                            fontSize: 10
                         },
-                        roam: true
+                        zoom:1
                     },
                     tooltip: {
                         trigger: "item"
@@ -705,18 +688,18 @@
                         name: "订单",
                         type: "scatter",
                         coordinateSystem: "geo",
-                        itemStyle:{
-                            color:"red"
+                        itemStyle: {
+                            color: "red"
                         },
-                        symbolSize: function(val) {
-                            return (val[2] / 10) + 8;
+                        symbolSize: function (val) {
+                            return (val[2] / 1000) + 2;
                         }
                     }, {
                         name: "最新",
                         type: "effectScatter",
                         coordinateSystem: "geo",
-                        symbolSize: function(val) {
-                            return (val[2] / 10) + 8;
+                        symbolSize: function (val) {
+                            return (val[2] / 1000) + 2;
                         },
                         label: {
                             normal: {
@@ -752,8 +735,8 @@
             //环形图定时展示
             pieIntervalShow(myChart) {
                 let currentIndex = -1;
-                setInterval(function () {
-                    var dataLen = myChart.getOption().series[0].data.length;
+                let showTip=function(){
+                    let dataLen = myChart.getOption().series[0].data.length;
                     // 取消之前高亮的图形
                     myChart.dispatchAction({
                         type: 'downplay',
@@ -773,10 +756,14 @@
                         seriesIndex: 0,
                         dataIndex: currentIndex
                     });
-                }, 5000)
+
+                    return showTip;
+                }
+                setInterval(showTip(), 5000);
             },
             // 营业排行数据刷新
             refreshBusinessRanking() {
+                let me = this;
                 let province = [""],
                     target = ["target"],
                     actual = ["actual"],
@@ -785,13 +772,13 @@
                     len, data, val, myChart, opts;
 
                 //调用api请求数据，没有则直接返回
-                let lineData = getBusinessRanking();
+                let lineData = me.businessRanking;
                 if (!lineData) return;
 
                 myChart = echarts.getInstanceByDom(document.getElementById("main1"));
                 opts = myChart.getOption();
 
-                data = lineData.result.businessRanking;;
+                data = lineData.businessRanking;
                 len = data.length;
                 for (; i < len; i++) {
                     if (data[i]["province"]) {
@@ -802,103 +789,147 @@
                         rate.push(val.substr(0, val.length - 1));
                     }
                 }
-                opts.dataset.source = [province, actual, target, rate];
+                opts.dataset={
+                    source:[province, actual, target, rate]
+                }
                 myChart.setOption(opts);
             },
             //订单实时统计数据刷新
             refreshRealTimeOrderNumLine() {
+                let me = this, data, time=[],val=[], myChart, opts;
 
+                //调用api请求数据，没有则直接返回
+                data = me.realTimeOrderNumLine;
+                if (!data) return;
+
+                myChart = echarts.getInstanceByDom(document.getElementById("main2"));
+                opts = myChart.getOption();
+
+                Object.keys(data).forEach(key=>{
+                    time.push(key);
+                    val.push(data[key]);
+                });
+                opts.dataset={
+                    source:[time,val]
+                };
+                myChart.setOption(opts);
+                myChart.dispatchAction({
+                    type: 'showTip',
+                    seriesIndex: 0,
+                    dataIndex: time.length - 2
+                });
             },
             //营业额实时统计数据刷新
             refreshRealTimeAmountLine() {
-                let source = [],
-                    i = 0,
-                    len, data, val, myChart, opts;
+                let me = this,time=[],val=[], data, myChart, opts;
 
                 //调用api请求数据，没有则直接返回
-                var lineData = getBusinessRanking();
-                if (!lineData) return;
+                data = me.realTimeAmountLine;
+                if (!data) return;
 
-                var myChart = echarts.getInstanceByDom(document.getElementById("main1"));
+                myChart = echarts.getInstanceByDom(document.getElementById("main6"));
                 opts = myChart.getOption();
 
+                Object.keys(data).forEach(key=>{
+                    time.push(key);
+                    val.push(data[key]);
+                });
+
+                opts.dataset={
+                    source:[time,val]
+                };
+                myChart.setOption(opts);
+                myChart.dispatchAction({
+                    type: 'showTip',
+                    seriesIndex: 0,
+                    dataIndex: time.length - 2
+                });
             },
             // 地图刷新
             refreshHeatMap() {
-              let data, i = 0, len,
-                  val, result = [], lnglat = [], allStore,
-                  currentStore,
-                  myChart, opts;
+                let me = this;
+                let data, i = 0, len,
+                    val, result = [], lnglat = [], allStore,
+                    currentStore,
+                    myChart, opts;
 
-              var myChart = echarts.getInstanceByDom(document.getElementById("main"));
-              opts = myChart.getOption();
+                myChart = echarts.getInstanceByDom(document.getElementById("main3"));
+                opts = myChart.getOption();
 
-              allStore = getOrderMap();
-              data = allStore.result.orderMapInfos;
-              len = data.length;
-              for (; i < len; i++) {
-                  val = data[i];
-                  lnglat = val["position"].split(',');
-                  if (lnglat.toString() != "0,0") {
-                      result.push({
-                          name: "",
-                          value: lnglat.concat(val["amount"])
-                      });
-                  }
-              }
-              opts.series[0].data = result;
+                allStore = me.orderMap;
+                if(allStore){
+                    data = allStore.orderMapInfos;
+                    len = data.length;
+                    for (; i < len; i++) {
+                        val = data[i];
+                        lnglat = val["position"].split(',');
+                        if (lnglat.toString() != "0,0") {
+                            result.push({
+                                name: "",
+                                value: lnglat.concat(val["amount"])
+                            });
+                        }
+                    }
+                    opts.series[0].data = result;
+                }
 
-              currentStore = getTransactionOrder();
-              data = currentStore.result.transOrderInfo;
-              i = 0;
-              len = data.length;
-              result = [];
-              for (; i < len; i++) {
-                  val = data[i];
-                  lnglat = val["position"].split(',');
-                  if (lnglat.toString() != "0,0") {
-                      result.push({
-                          name: val["storename"],
-                          value: lnglat.concat(val["orderamount"])
-                      });
-                  }
-              }
-          
-              opts.series[1].data = result;
-              myChart.setOption(opts);
+                currentStore = me.transactionOrder;
+                if(currentStore){
+                    data = currentStore.transOrderInfo;
+                    i = 0;
+                    len = data.length;
+                    result = [];
+                    for (; i < len; i++) {
+                        val = data[i];
+                        lnglat = val["position"].split(',');
+                        if (lnglat.toString() != "0,0") {
+                            result.push({
+                                name: val["storename"],
+                                value: lnglat.concat(val["orderamount"])
+                            });
+                        }
+                    }
+                    opts.series[1].data = result;
+                }
+
+                myChart.setOption(opts);
             },
             //会员刷新
-             refreshMember() {
+            refreshMember() {
+                let me = this;
                 let myChart, opts;
 
                 //调用api请求数据，没有则直接返回
-                let lineData = getMember();
-                if (!lineData) return;
+                let data = me.member;
+                if (!data) return;
 
                 //会员等级main4
                 myChart = echarts.getInstanceByDom(document.getElementById("main4"));
                 opts = myChart.getOption();
-                opts.series[0].data = lineData.memberLevel;
+                opts.series[0].data = data.memberLevel||[];
                 myChart.setOption(opts);
+                me.pieIntervalShow(myChart);
 
                 //新老会员main5
                 myChart = echarts.getInstanceByDom(document.getElementById("main5"));
                 opts = myChart.getOption();
-                opts.series[0].data = lineData.memberDistribute;
+                opts.series[0].data = data.memberDistribute||[];
                 myChart.setOption(opts);
+                me.pieIntervalShow(myChart);
             },
             //定时刷新
-            intervalData(){
+            intervalData() {
+                let me = this;
                 let refreshData = function () {
-                  refreshBusinessRanking();
-                  refreshRealTimeAmountLine();
-                  refreshRealTimeOrderNumLine();
-                  refreshMember();
-                  refreshHeatMap();
+                    me.refreshBusinessRanking();
+                    me.refreshRealTimeAmountLine();
+                    me.refreshRealTimeOrderNumLine();
+                    me.refreshMember();
+                    me.refreshHeatMap();
 
-                  return refreshData;
-              }
-              setInterval(refreshData(), 1000 * 60 * 5);
+                    return refreshData;
+                };
+                setInterval(refreshData(), 1000 * 60 * me.refreshTime);
             }
         },
         computed: {

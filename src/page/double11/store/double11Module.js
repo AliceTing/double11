@@ -21,7 +21,7 @@ export default {
         mainTitle: {},
         realTimeAmountLine:{},
         realTimeOrderNumLine: {},
-        businessRanking: []
+        businessRanking: {}
     },
     actions: {
         //成交订单滚动屏
@@ -153,6 +153,7 @@ export default {
         },
         ['setBusinessRanking'](state, data){
             state.businessRanking = data;
+
         }
     }
 }
