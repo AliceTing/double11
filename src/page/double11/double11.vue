@@ -328,9 +328,14 @@
             // 实时时钟显示
             me.getRealTime();
 
-            me.getHeatMapOrderData();
-            me.getVipRatioData();
-            me.getNewOldData();
+            // me.getHeatMapOrderData();
+            // me.getVipRatioData();
+            // me.getNewOldData();
+
+            me.getMember();
+
+            // me.getClubCardInfo();
+
         },
         mounted() {
             let me = this;
@@ -345,7 +350,9 @@
             ...mapActions([
                 'getHeatMapOrderData',
                 'getVipRatioData',
-                'getNewOldData'
+                'getNewOldData',
+                'getMember',
+                'getClubCardInfo'
             ]),
             // 实时时钟显示
             getRealTime() {
@@ -1374,9 +1381,14 @@
         },
         computed: {
             ...mapState({
-                heatMapOrderArr: state => state.double11Module.heatMapOrderArr,
-                vipRatioObj: state => state.double11Module.vipRatioObj,
-                newOldObj: state => state.double11Module.newOldObj,
+                transactionOrder: state => state.double11Module.transactionOrder,
+                member: state => state.double11Module.member,
+                orderMap: state => state.double11Module.orderMap,
+                targetComplete: state => state.double11Module.targetComplete,
+                mainTitle: state => state.double11Module.mainTitle,
+                realTimeAmountLine: state => state.double11Module.realTimeAmountLine,
+                realTimeOrderNumLine: state => state.double11Module.realTimeOrderNumLine,
+                businessRanking: state => state.double11Module.businessRanking
             }),
             setSingleHeight() {
                 let singleHeight = parseInt((window.innerHeight - 30) / 3);
