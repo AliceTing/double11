@@ -11,18 +11,28 @@
         .left,
         .right {
             width: 30%;
+            padding: 60px 40px 30px;
+            box-sizing: border-box;
         }
         .middle {
             width: 40%;
-            box-sizing: border-box;
+
         }
         .left .inner,
         .right .inner {
-            margin: 20px 40px 0;
             box-sizing: border-box;
             border: solid 1px rgba(60, 46, 213, .54);
             background-color: rgba(60, 46, 213, .14);
             border-radius: 10px;
+        }
+        .left .inner .data_md:first-child,
+        .right .inner .data_md:first-child{
+            padding-top: 20px;
+            .con{
+                height: 100%;
+                margin-top: 50%;
+                transform: translateY(-50%);
+            }
         }
         .chart {
             width: 100%;
@@ -69,6 +79,7 @@
         }
         .data_md {
             box-sizing: border-box;
+            overflow: hidden;
             .name {
                 height: 30px;
                 padding-left: 20px;
@@ -86,13 +97,25 @@
                 }
             }
             &.deal_order {
-                position: relative;
-                height: 185px;
-                padding: 20px 40px;
-                border: solid 1px rgba(60, 46, 213, .54);
-                background-color: rgba(60, 46, 213, .14);
+                padding-bottom: 30px;
                 color: #DCE2E9;
                 font-size: 22px;
+                .con {
+                    display: flex;
+                    flex-direction: column;
+                    position: relative;
+                    height: 100%;
+                    padding: 20px 40px;
+                    box-sizing: border-box;
+                    border: solid 1px rgba(60, 46, 213, .54);
+                    background-color: rgba(60, 46, 213, .14);
+                }
+                .main{
+                    flex: 1;
+                    overflow: hidden;
+                }
+                .list{
+                }
                 .name {
                     margin-bottom: 15px;
                     padding-left: 0;
@@ -125,20 +148,42 @@
             }
         }
         .goal_reach {
-            margin-top: 30px;
+            margin-top: 50px;
             .box {
                 position: relative;
                 padding: 0 20px;
                 .rate {
                     position: absolute;
                     top: -54px;
-                    padding: 5px;
+                    z-index: 4;
+                    margin-left: -48px;
+                    padding: 5px 8px;
                     border-radius: 5px;
-                    border: 2px #413389 solid;
+                    border: 2px #593AFF solid;
                     background-color: #3E24A7;
                     color: #fff;
                     font-size: 30px;
                     text-align: center;
+                    &:before,
+                    &:after{
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        width: 0;
+                        height: 0;
+                        margin: auto;
+                        border-style: solid dashed dashed dashed;
+                        border-width: 14px 10px;
+                    }
+                    &:before{
+                        bottom: -30px;
+                        border-color: #593AFF transparent transparent transparent;
+                    }
+                    &:after{
+                        bottom: -27px;
+                        border-color: #3E24A7 transparent transparent transparent;
+                    }
                 }
                 .bar {
                     position: relative;
@@ -176,10 +221,30 @@
                     font-weight: normal;
                 }
                 .value {
-                    margin-top: 10px;
+                    margin-top: 30px;
                     font-size: 40px;
                     .unit {
                         font-size: 22px;
+                    }
+                    .up{
+                        position: relative;
+                        display: inline-block;
+                        width: 8px;
+                        height: 15px;
+                        margin-left: 10px;
+                        background-color: #CB2106;
+                        &:before{
+                            content: '';
+                            position: absolute;
+                            top: -18px;
+                            left: 50%;
+                            width: 0;
+                            height: 0;
+                            border-color: transparent transparent #CB2106 transparent;
+                            border-width: 10px;
+                            border-style: dashed dashed solid dashed;
+                            transform: translateX(-50%);
+                        }
                     }
                 }
             }
@@ -223,7 +288,8 @@
                                 <li>
                                     <h4>同比增长</h4>
                                     <div class="value">{{goldReach.increaseRate.substr(0,goldReach.increaseRate.length -
-                                        1)}}<span class="unit">%</span></div>
+                                        1)}}<span class="unit">%</span><span class="up" v-if="parseFloat(goldReach.increaseRate) > 0"></span>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
@@ -240,36 +306,44 @@
             </div>
         </div>
         <div class="wrap middle">
-            <div class="title">
-                <div class="real_time">{{realTime}}</div>
-                <div class="total_price">￥{{totalPrice | parseFormatNum}}</div>
-            </div>
-            <div class="detail_info clearfix">
-                <div class="item customers">
-                    <div class="key">客户数</div>
-                    <div class="value">{{customers}}</div>
+            <div class="data_md" :style="{height: setMiddleSingleHeight*2/3 + 'px'}">
+                <div class="title">
+                    <div class="real_time">{{realTime}}</div>
+                    <div class="total_price">￥{{mainTitle.amount | parseFormatNum}}</div>
                 </div>
-                <div class="item orders">
-                    <div class="key">订单数</div>
-                    <div class="value">{{orderNumber}}</div>
-                </div>
-                <div class="item univalence">
-                    <div class="key">客单价</div>
-                    <div class="value">￥{{unitPrice}}</div>
-                </div>
-            </div>
-            <div id="main3" :style="{height: setSingleHeight*3/2 + 'px'}"></div>
-            <div class="data_md deal_order">
-                <h2 class="name">成交订单</h2>
-                <div class="con">
-                    <div class="item" v-for="(item,index) in transactionOrder" :key="index">
-                        <div class="user">{{item.userName}}</div>
-                        <div class="store">{{item.store}}</div>
-                        <div class="amount">{{item.amount}}</div>
-                        <div class="time">{{item.time}}</div>
+                <div class="detail_info clearfix">
+                    <div class="item customers">
+                        <div class="key">客户数</div>
+                        <div class="value">{{mainTitle.userNum}}</div>
+                    </div>
+                    <div class="item orders">
+                        <div class="key">订单数</div>
+                        <div class="value">{{mainTitle.orderNum}}</div>
+                    </div>
+                    <div class="item univalence">
+                        <div class="key">客单价</div>
+                        <div class="value">￥{{mainTitle.avgPrice}}</div>
                     </div>
                 </div>
-                <div class="bottom_blur"></div>
+            </div>
+            <div class="data_md" :style="{height: setMiddleSingleHeight + 'px'}">
+                <div id="main3" :style="{height: setMiddleSingleHeight - 50 + 'px'}"></div>
+            </div>
+            <div class="data_md deal_order" :style="{height: setMiddleSingleHeight*1/3 + 'px'}">
+                <div class="con">
+                    <h2 class="name">成交订单</h2>
+                    <div class="main" id="scrollBox">
+                        <div class="list">
+                            <div class="item" v-for="(item,index) in transactionOrder.transOrderInfo" :key="index">
+                                <div class="user">{{item.customer_id}}</div>
+                                <div class="store">{{item.storename}}</div>
+                                <div class="amount">{{item.orderamount}}</div>
+                                <div class="time">{{item.dt}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom_blur"></div>
+                </div>
             </div>
         </div>
         <div class="wrap right">
@@ -320,7 +394,8 @@
                 }, {
                     'name': '营业额实时统计'
                 }],
-                refreshTime:5
+                refreshTime:5,
+                singleBoxHeight: ''
             }
         },
         created() {
@@ -344,8 +419,8 @@
             me.newOldRatioChart();
             me.salesStatisticsChart();
             me.orderHeatChart();
-
             me.intervalData();
+            me.getMainTitle();
         },
         methods: {
             ...mapActions([
@@ -723,6 +798,7 @@
                     }]
                 };
                 me.initChart(document.getElementById('main3'), opt);
+                me.transactionOrderMove();
             },
             // 初始化图表
             initChart(el, opts, type) {
@@ -731,6 +807,42 @@
                     myChart.setOption(opts);
                     return myChart;
                 }
+            },
+            //订单列表循环滚动
+            transactionOrderMove(){
+                let area =document.getElementById('scrollBox');
+                let lHeight = 24;
+                let time = 50;
+                area.innerHTML+=area.innerHTML;
+                area.scrollTop = 0;
+                let timer;
+                // var scrollMove = function () {
+                //     area.scrollTop++;
+                //     timer = setInterval("scrollUp()",time);
+                // }
+                // function scrollMove(){
+                //     area.scrollTop++;
+                //     timer = setInterval("scrollUp()",time);
+                // }
+
+                function scrollUp(){
+                    if(area.scrollTop % lHeight==0){
+                        clearInterval(timer);
+                        setTimeout(function () {
+                            area.scrollTop++;
+                            timer = setInterval("scrollUp()",time);
+                        },2000);
+                    }else{
+                        area.scrollTop++;
+                        if(area.scrollTop>=area.scrollHeight/2){    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
+                            area.scrollTop = 0;
+                        }
+                    }
+
+                }
+                console.log(11,this)
+
+                setTimeout("this.scrollMove()",2000);
             },
             //环形图定时展示
             pieIntervalShow(myChart) {
@@ -944,8 +1056,14 @@
                 businessRanking: state => state.double11Module.businessRanking
             }),
             setSingleHeight() {
-                let singleHeight = parseInt((window.innerHeight - 30) / 3);
+                let innerBoxHeight = window.innerHeight - 90;
+                let singleHeight = Math.floor(parseInt((innerBoxHeight) / 3));
                 return singleHeight;
+            },
+            setMiddleSingleHeight(){
+                let innerBoxHeight = window.innerHeight;
+                let middleSingleHeight = Math.floor(parseInt((innerBoxHeight) / 2));
+                return middleSingleHeight;
             }
         }
     }

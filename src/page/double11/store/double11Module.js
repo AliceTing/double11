@@ -143,7 +143,7 @@ export default {
             state.targetComplete = data;
         },
         ['setMainTitle'](state, data){
-            state.mainTitle = data;
+            state.mainTitle = data.mainTitle || {};
         },
         ['setRealTimeAmountLine'](state, data){
             state.realTimeAmountLine = data;
