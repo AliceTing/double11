@@ -28,6 +28,8 @@
         .left .inner .data_md:first-child,
         .right .inner .data_md:first-child{
             padding-top: 20px;
+        }
+        .left .inner .data_md:first-child{
             .con{
                 height: 100%;
                 margin-top: 50%;
@@ -816,22 +818,17 @@
                 area.innerHTML+=area.innerHTML;
                 area.scrollTop = 0;
                 let timer;
-                // var scrollMove = function () {
-                //     area.scrollTop++;
-                //     timer = setInterval("scrollUp()",time);
-                // }
-                // function scrollMove(){
-                //     area.scrollTop++;
-                //     timer = setInterval("scrollUp()",time);
-                // }
+
+
+                function scrollMove(){
+                    area.scrollTop++;
+                    timer = setInterval("scrollUp()",time);
+                }
 
                 function scrollUp(){
-                    if(area.scrollTop % lHeight==0){
+                    if(area.scrollTop % lHeight==0){//滚动一行后，延时2秒
                         clearInterval(timer);
-                        setTimeout(function () {
-                            area.scrollTop++;
-                            timer = setInterval("scrollUp()",time);
-                        },2000);
+                        setTimeout("scrollMove()",2000);
                     }else{
                         area.scrollTop++;
                         if(area.scrollTop>=area.scrollHeight/2){    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
@@ -840,9 +837,8 @@
                     }
 
                 }
-                console.log(11,this)
 
-                setTimeout("this.scrollMove()",2000);
+                setTimeout("scrollMove()",2000);//延迟2秒后执行scrollMove
             },
             //环形图定时展示
             pieIntervalShow(myChart) {
