@@ -115,6 +115,7 @@
                 .main{
                     flex: 1;
                     overflow: hidden;
+                    scroll-y:auto;
                 }
                 .list{
                 }
@@ -125,9 +126,13 @@
                 .item {
                     display: flex;
                     justify-content: space-between;
-                    margin: 12px 0;
+                    /*margin: 12px 0;*/
                     font-size: 22px;
-                    line-height: 30px;
+                    height: 40px;
+                    line-height: 40px;
+                    overflow: hidden;
+                    box-sizing: border-box;
+                    border-bottom: solid 1px #fff;
                     .user {
                         flex: 1;
                     }
@@ -150,10 +155,10 @@
             }
         }
         .goal_reach {
-            margin-top: 50px;
+            margin-top: 30px;
             .box {
                 position: relative;
-                padding: 0 20px;
+                padding: 0 40px;
                 .rate {
                     position: absolute;
                     top: -54px;
@@ -214,8 +219,8 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-top: 30px;
-                padding: 0 20px;
+                margin-top: 50px;
+                padding: 0 40px;
                 color: #61ABFF;
                 font-size: 20px;
                 line-height: 30px;
@@ -813,32 +818,54 @@
             //订单列表循环滚动
             transactionOrderMove(){
                 let area =document.getElementById('scrollBox');
-                let lHeight = 24;
+                let lHeight = 40;
                 let time = 50;
                 area.innerHTML+=area.innerHTML;
                 area.scrollTop = 0;
                 let timer;
+                let sh=0;
 
 
-                function scrollMove(){
-                    area.scrollTop++;
-                    timer = setInterval("scrollUp()",time);
-                }
+                let fn={
 
-                function scrollUp(){
-                    if(area.scrollTop % lHeight==0){//滚动一行后，延时2秒
-                        clearInterval(timer);
-                        setTimeout("scrollMove()",2000);
-                    }else{
-                        area.scrollTop++;
-                        if(area.scrollTop>=area.scrollHeight/2){    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
-                            area.scrollTop = 0;
+                    scrollMove:function () {
+                        sh++;
+                        area.scrollTop=sh;
+                        timer = setInterval(fn.scrollUp,time);
+                    },
+                    scrollUp:function () {
+                        if(Math.ceil(area.scrollTop)  % lHeight==0){//滚动一行后，延时2秒
+                            clearInterval(timer);
+                            setTimeout(fn.scrollMove,2000);
+                        }else{
+                            sh++;
+                            area.scrollTop=sh;
+                            if(area.scrollTop>=area.scrollHeight/2){    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
+                                area.scrollTop = 0;
+                                sh=0;
+                            }
                         }
                     }
+                };
+                // function scrollMove(){
+                //     area.scrollTop++;
+                //     timer = setInterval("scrollUp()",time);
+                // }
+                //
+                // function scrollUp(){
+                //     if(area.scrollTop % lHeight==0){//滚动一行后，延时2秒
+                //         clearInterval(timer);
+                //         setTimeout("scrollMove()",2000);
+                //     }else{
+                //         area.scrollTop++;
+                //         if(area.scrollTop>=area.scrollHeight/2){    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
+                //             area.scrollTop = 0;
+                //         }
+                //     }
+                //
+                // }
 
-                }
-
-                setTimeout("scrollMove()",2000);//延迟2秒后执行scrollMove
+                setTimeout(fn.scrollMove,2000);//延迟2秒后执行scrollMove
             },
             //环形图定时展示
             pieIntervalShow(myChart) {
