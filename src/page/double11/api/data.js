@@ -154,28 +154,28 @@ export const businessRanking = {
         "businessRanking": [{
             "province": "北京",
             "saleAmount": "1111.11",
-            "targetAmount": "232226.83",
-            "targetRate": "0.480%"
-        }, {"province": null, "saleAmount": "222.22", "targetAmount": "0", "targetRate": "0.000%"}, {
+            "targetAmount": "23226.83",
+            "targetRate": "1.480%"
+        }, {"province": null, "saleAmount": "222.22", "targetAmount": "0", "targetRate": "19.000%"}, {
             "province": "浙江",
             "saleAmount": "2213.41",
-            "targetAmount": "655907.34",
-            "targetRate": "0.340%"
+            "targetAmount": "25597.34",
+            "targetRate": "4.340%"
         }, {
             "province": "江苏",
             "saleAmount": "24523.12",
-            "targetAmount": "3910107.49",
-            "targetRate": "0.630%"
+            "targetAmount": "39107.49",
+            "targetRate": "10.630%"
         }, {
             "province": "天津",
             "saleAmount": "341324.12",
             "targetAmount": "30265.94",
-            "targetRate": "1127.750%"
-        }, {"province": "河北", "saleAmount": "43253.12", "targetAmount": "0", "targetRate": "0.000%"}, {
+            "targetRate": "7.750%"
+        }, {"province": "河北", "saleAmount": "4253.12", "targetAmount": "0", "targetRate": "12.000%"}, {
             "province": "山西",
-            "saleAmount": "433837.54",
+            "saleAmount": "43387.54",
             "targetAmount": "0",
-            "targetRate": "0.000%"
+            "targetRate": "0.800%"
         }]
     },
     "succ": true
@@ -198,7 +198,7 @@ export const realTimeOrderNumLine = {
 export const mainTitle = {
     "code": 0,
     "message": "success",
-    "result": {"mainTitle": {"amount": "17484.48", "orderNum": "288", "userNum": "1", "avgPrice": "17484.48"}},
+    "result": {"mainTitle": {"amount": "17484.48", "orderNum": "288", "userNum": "100", "avgPrice": "17484.48"}},
     "succ": true
 }
 

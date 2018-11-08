@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiHost = '//10.18.13.200:8080/realtime-service/';
+const apiHost = '//bi.laiyifen.com/realtime-service/';
 
 const apiUrl = {
     // 订单滚动屏

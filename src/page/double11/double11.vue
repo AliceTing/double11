@@ -109,7 +109,6 @@
                     height: 100%;
                     padding: 20px 40px;
                     box-sizing: border-box;
-                    border: solid 1px rgba(60, 46, 213, .54);
                     background-color: rgba(60, 46, 213, .14);
                 }
                 .main{
@@ -126,13 +125,11 @@
                 .item {
                     display: flex;
                     justify-content: space-between;
-                    /*margin: 12px 0;*/
                     font-size: 22px;
                     height: 40px;
                     line-height: 40px;
                     overflow: hidden;
                     box-sizing: border-box;
-                    border-bottom: solid 1px #fff;
                     .user {
                         flex: 1;
                     }
@@ -263,7 +260,7 @@
     html,
     body {
         height: 100%;
-        background-color: #16084b;
+        background: linear-gradient(0deg, #16084a, #16084b);
     }
 </style>
 
@@ -316,20 +313,20 @@
             <div class="data_md" :style="{height: setMiddleSingleHeight*2/3 + 'px'}">
                 <div class="title">
                     <div class="real_time">{{realTime}}</div>
-                    <div class="total_price">￥{{mainTitle.amount | parseFormatNum}}</div>
+                    <div class="total_price">￥{{mainInfo.amount | parseFormatNum}}</div>
                 </div>
                 <div class="detail_info clearfix">
                     <div class="item customers">
                         <div class="key">客户数</div>
-                        <div class="value">{{mainTitle.userNum}}</div>
+                        <div class="value">{{mainInfo.userNum}}</div>
                     </div>
                     <div class="item orders">
                         <div class="key">订单数</div>
-                        <div class="value">{{mainTitle.orderNum}}</div>
+                        <div class="value">{{mainInfo.orderNum}}</div>
                     </div>
                     <div class="item univalence">
                         <div class="key">客单价</div>
-                        <div class="value">￥{{mainTitle.avgPrice}}</div>
+                        <div class="value">￥{{mainInfo.avgPrice}}</div>
                     </div>
                 </div>
             </div>
@@ -401,8 +398,10 @@
                 }, {
                     'name': '营业额实时统计'
                 }],
-                refreshTime:5,
-                singleBoxHeight: ''
+                refreshTime:5 * 60,
+                singleBoxHeight: '',
+                mainInfo:{}
+
             }
         },
         created() {
@@ -410,27 +409,45 @@
             // 实时时钟显示
             me.getRealTime();
 
+            // 调接口取数据
+            me.getTargetComplete();
             me.getBusinessRanking();
             me.getOrderMap();
             me.getTransactionOrder();
-            me.getMember();
             me.getRealTimeOrderNumLine();
             me.getRealTimeAmountLine();
 
         },
         mounted() {
             let me = this;
+
+            // 初始化图表
+
+            // 营业排行
             me.businessRankingChart();
+
+            // 会员
             me.vipDistributionChart();
-            me.orderStatisticsChart();
             me.newOldRatioChart();
+
+            // 订单实时统计
+            me.orderStatisticsChart();
+
+            // 营业额实时统计
             me.salesStatisticsChart();
+
+            // 热力图
             me.orderHeatChart();
-            me.intervalData();
+
+            // 数据总览
             me.getMainTitle();
+
+            // 定时刷新数据
+            me.intervalData();
         },
         methods: {
             ...mapActions([
+                'getData',
                 'getTransactionOrder',
                 'getMember',
                 'getOrderMap',
@@ -479,7 +496,7 @@
                         ],
                         y: "bottom",
                         textStyle: {
-                            color: '#3D3E86'
+                            color: '#69b7ff'
                         }
                     },
                     xAxis: [
@@ -488,7 +505,7 @@
                             axisLabel: {
                                 show: true,
                                 textStyle: {
-                                    color: '#3D3E86',
+                                    color: '#69b7ff',
                                     fontSize: '14'
                                 }
                             }
@@ -500,8 +517,18 @@
                             axisLabel: {
                                 show: true,
                                 textStyle: {
-                                    color: '#3D3E86',
+                                    color: '#69b7ff',
                                     fontSize: '14'
+                                },
+                                formatter:function (val,index) {
+                                    return (parseFloat(val)/10000)+"W";
+                                }
+                            },
+                            splitLine:{
+                                lineStyle: {
+                                    type: 'dashed',
+                                    color: ['#fff'],
+                                    opacity:0.3
                                 }
                             }
                         },
@@ -519,7 +546,10 @@
                             encode: {
                                 y: 3
                             },
-                            smooth: true
+                            smooth: true,
+                            lineStyle:{
+                                width:3
+                            }
                         },
                         {
                             name: "actual",
@@ -553,10 +583,31 @@
                     },
                     xAxis: [{
                         type: "category",
-                        boundaryGap: true
+                        boundaryGap: true,
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#69b7ff',
+                                fontSize: '14'
+                            }
+                        }
                     }],
                     yAxis: [{
-                        type: "value"
+                        type: "value",
+                        splitLine:{
+                            lineStyle: {
+                                type: 'dashed',
+                                color: ['#fff'],
+                                opacity:0.3
+                            }
+                        },
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#69b7ff',
+                                fontSize: '14'
+                            }
+                        }
                     }],
                     legend: {
                         data: [
@@ -565,7 +616,7 @@
                         ],
                         y: "bottom",
                         textStyle: {
-                            color: '#3D3E86'
+                            color: '#69b7ff'
                         }
                     },
                     series: [
@@ -579,6 +630,9 @@
                                         type: "default"
                                     }
                                 }
+                            },
+                            lineStyle:{
+                                width:3
                             },
                             seriesLayoutBy: "row",
                             areaStyle: {
@@ -631,23 +685,19 @@
                     series: [{
                         type: "pie",
                         selectedMode: "multiple",
+                        center:[
+                            "50%",
+                            "40%"
+                        ],
                         radius: [
                             "50%",
-                            "70%"
+                            "75%"
                         ],
                         label: {
-                            normal: {
-                                show: false,
-                                position: 'center'
-                            },
-                            emphasis: {
-                                show: true,
-                                formatter: "{b}:{d}%",
-                                textStyle: {
-                                    fontSize: '30',
-                                    fontWeight: 'bold'
-                                }
-                            }
+                            show: true,
+                            position: 'outside',
+                            formatter: "{b}:{d}%",
+                            fontSize:24
                         },
                         data: []
                     }
@@ -662,9 +712,8 @@
                 let opt = {
                     color: ["#009dc2", "#7e5dd7", "#5113b1"],
                     tooltip: {
-                        trigger: "item",
                         formatter: "{b}:{c}({d}%)",
-                        show: false
+                        show: true
                     },
                     legend: {
                         orient: "horizontal",
@@ -680,21 +729,13 @@
                             selectedMode: "multiple",
                             radius: [
                                 "50%",
-                                "70%"
+                                "75%"
                             ],
                             label: {
-                                normal: {
-                                    show: false,
-                                    position: 'center'
-                                },
-                                emphasis: {
-                                    show: true,
-                                    formatter: "{b}:{d}%",
-                                    textStyle: {
-                                        fontSize: '30',
-                                        fontWeight: 'bold'
-                                    }
-                                }
+                                show: true,
+                                position: 'outside',
+                                formatter: "{b}:{d}%",
+                                fontSize:24
                             },
                             data: []
                         }
@@ -714,10 +755,34 @@
                     },
                     xAxis: [{
                         type: "category",
-                        boundaryGap: true
+                        boundaryGap: true,
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#69b7ff',
+                                fontSize: '14'
+                            }
+                        }
                     }],
                     yAxis: [{
-                        type: "value"
+                        type: "value",
+                        splitLine:{
+                            lineStyle: {
+                                type: 'dashed',
+                                color: ['#fff'],
+                                opacity:0.3
+                            }
+                        },
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#69b7ff',
+                                fontSize: '14'
+                            },
+                            formatter:function (val,index) {
+                                return (parseFloat(val)/10000)+"W";
+                            }
+                        }
                     }],
                     legend: {
                         data: [
@@ -726,7 +791,7 @@
                         ],
                         y: "bottom",
                         textStyle: {
-                            color: '#3D3E86'
+                            color: '#69b7ff'
                         }
                     },
                     series: [
@@ -738,6 +803,9 @@
                             encode:{
                                 x:0,
                                 y:1
+                            },
+                            lineStyle:{
+                                width:3
                             }
                         },
                         // {
@@ -761,7 +829,13 @@
                             //show: true,
                             fontSize: 10
                         },
-                        zoom:1
+                        itemStyle:{
+                            normal:{
+                                areaColor:"#1359a8",
+                                borderColor:"#5013b1"
+                            }
+                        },
+                        zoom:1.5
                     },
                     tooltip: {
                         trigger: "item"
@@ -771,17 +845,19 @@
                         type: "scatter",
                         coordinateSystem: "geo",
                         itemStyle: {
-                            color: "red"
+                            color: "#7151ae"
                         },
                         symbolSize: function (val) {
-                            return (val[2] / 1000) + 2;
+                            let len=parseInt(val[2]).toString().length;
+                            return (val[2] / Math.pow(10,len)) + 8;
                         }
                     }, {
                         name: "最新",
                         type: "effectScatter",
                         coordinateSystem: "geo",
                         symbolSize: function (val) {
-                            return (val[2] / 1000) + 2;
+                            let len=parseInt(val[2]).toString().length;
+                            return (val[2] / Math.pow(10,len)) + 8;
                         },
                         label: {
                             normal: {
@@ -792,7 +868,7 @@
                         },
                         itemStyle: {
                             normal: {
-                                color: "#f4e925",
+                                color: "#c3b450",
                                 shadowBlur: 10,
                                 shadowColor: "#333"
                             }
@@ -809,6 +885,7 @@
             },
             // 初始化图表
             initChart(el, opts, type) {
+                let me = this;
                 if (el) {
                     let myChart = echarts.init(el);
                     myChart.setOption(opts);
@@ -825,45 +902,27 @@
                 let timer;
                 let sh=0;
 
+                let fn = {
 
-                let fn={
-
-                    scrollMove:function () {
+                    scrollMove: function () {
                         sh++;
-                        area.scrollTop=sh;
-                        timer = setInterval(fn.scrollUp,time);
+                        area.scrollTop = sh;
+                        timer = setInterval(fn.scrollUp, time);
                     },
-                    scrollUp:function () {
-                        if(Math.ceil(area.scrollTop)  % lHeight==0){//滚动一行后，延时2秒
+                    scrollUp: function () {
+                        if (Math.ceil(area.scrollTop) % lHeight == 0) {//滚动一行后，延时2秒
                             clearInterval(timer);
-                            setTimeout(fn.scrollMove,2000);
-                        }else{
+                            setTimeout(fn.scrollMove, 2000);
+                        } else {
                             sh++;
-                            area.scrollTop=sh;
-                            if(area.scrollTop>=area.scrollHeight/2){    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
+                            area.scrollTop = sh;
+                            if (area.scrollTop >= area.scrollHeight / 2) {    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
                                 area.scrollTop = 0;
-                                sh=0;
+                                sh = 0;
                             }
                         }
                     }
                 };
-                // function scrollMove(){
-                //     area.scrollTop++;
-                //     timer = setInterval("scrollUp()",time);
-                // }
-                //
-                // function scrollUp(){
-                //     if(area.scrollTop % lHeight==0){//滚动一行后，延时2秒
-                //         clearInterval(timer);
-                //         setTimeout("scrollMove()",2000);
-                //     }else{
-                //         area.scrollTop++;
-                //         if(area.scrollTop>=area.scrollHeight/2){    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
-                //             area.scrollTop = 0;
-                //         }
-                //     }
-                //
-                // }
 
                 setTimeout(fn.scrollMove,2000);//延迟2秒后执行scrollMove
             },
@@ -926,7 +985,7 @@
                 }
                 opts.dataset={
                     source:[province, actual, target, rate]
-                }
+                };
                 myChart.setOption(opts);
             },
             //订单实时统计数据刷新
@@ -959,6 +1018,7 @@
                 let me = this,time=[],val=[], data, myChart, opts;
 
                 //调用api请求数据，没有则直接返回
+                //me.getRealTimeAmountLine();
                 data = me.realTimeAmountLine;
                 if (!data) return;
 
@@ -1033,38 +1093,111 @@
             refreshMember() {
                 let me = this;
                 let myChart, opts;
-
                 //调用api请求数据，没有则直接返回
-                let data = me.member;
-                if (!data) return;
+                me.getData({
+                    action: 'getMember',
+                    fn(data){
+                        //会员等级main4
+                        myChart = echarts.getInstanceByDom(document.getElementById("main4"));
+                        opts = myChart.getOption();
+                        opts.series[0].data = data.memberLevel||[];
+                        myChart.setOption(opts);
+                        // me.pieIntervalShow(myChart);
 
-                //会员等级main4
-                myChart = echarts.getInstanceByDom(document.getElementById("main4"));
-                opts = myChart.getOption();
-                opts.series[0].data = data.memberLevel||[];
-                myChart.setOption(opts);
-                me.pieIntervalShow(myChart);
+                        //新老会员main5
+                        myChart = echarts.getInstanceByDom(document.getElementById("main5"));
+                        opts = myChart.getOption();
+                        opts.series[0].data = data.memberDistribute||[];
+                        myChart.setOption(opts);
+                    }
+                });
+            },
+            //中央数据
+            refreshMainTitle(){
+                let me = this, count = 4,
+                    numA, numO, numU, numP,
+                    amount, orderNum, userNum, avgPrice,
+                    time = 1000 * 30;
 
-                //新老会员main5
-                myChart = echarts.getInstanceByDom(document.getElementById("main5"));
-                opts = myChart.getOption();
-                opts.series[0].data = data.memberDistribute||[];
-                myChart.setOption(opts);
-                me.pieIntervalShow(myChart);
+                var getNum = function (tar, des) {
+                    return Math.ceil(((parseInt(tar) - parseInt(des)) / (time / 100)));
+                }
+                //调用api请求数据，没有则直接返回
+                me.getData({
+                    action: 'getMainTitle',
+                    fn(data) {
+
+                        amount = 15000;//parseInt(me.mainInfo.amount);
+                        orderNum = 200;
+                        userNum = 0;
+                        avgPrice = 16000;
+
+                        numA = getNum(me.mainTitle.amount, amount);
+                        numO = getNum(me.mainTitle.orderNum, orderNum);
+                        numU = getNum(me.mainTitle.userNum, userNum);
+                        numP = getNum(me.mainTitle.avgPrice, avgPrice);
+
+
+                        var t = setInterval(function () {
+                            count = 4;
+
+                            amount += numA;
+                            if (amount >= me.mainTitle.amount) {
+                                amount = me.mainTitle.amount;
+                                count--;
+                            }
+
+                            orderNum += numO;
+                            if (orderNum >= me.mainTitle.orderNum) {
+                                orderNum = me.mainTitle.orderNum;
+                                count--;
+                            }
+
+                            userNum+=numU;
+                            if (userNum >= me.mainTitle.userNum) {
+                                userNum = me.mainTitle.userNum;
+                                count--;
+                            }
+
+                            avgPrice+=numP;
+                            if (avgPrice >= me.mainTitle.avgPrice) {
+                                avgPrice = me.mainTitle.avgPrice;
+                                count--;
+                            }
+
+
+                            if( count==0){
+                                clearInterval(t);
+                            }
+
+                            me.mainInfo = {
+                                amount: amount,
+                                orderNum: orderNum,
+                                userNum: userNum,
+                                avgPrice: avgPrice
+                            };
+                        }, 100);
+
+
+
+                    }
+                });
             },
             //定时刷新
             intervalData() {
                 let me = this;
                 let refreshData = function () {
+
                     me.refreshBusinessRanking();
                     me.refreshRealTimeAmountLine();
                     me.refreshRealTimeOrderNumLine();
                     me.refreshMember();
                     me.refreshHeatMap();
+                    me.refreshMainTitle();
 
                     return refreshData;
                 };
-                setInterval(refreshData(), 1000 * 60 * me.refreshTime);
+                setInterval(refreshData(), 1000 * me.refreshTime);
             }
         },
         computed: {

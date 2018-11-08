@@ -27,6 +27,11 @@ export default {
         //成交订单滚动屏
         getTransactionOrder({commit}) {
             // apis.getTransactionOrder().then(data => {
+            //     if(data.code == 0){
+            //         commit('setTransactionOrder', getValue(data, 'result'));
+            //     }else {
+            //
+            //     }
             // }).catch(err => {
             //     Vue.$toast.show({
             //         toastText: '服务异常，请稍后重试'
@@ -37,22 +42,31 @@ export default {
             // });
             commit('setTransactionOrder', getValue(transactionOrder, 'result'));
         },
-        // 会员
-        getMember({commit}) {
-            // apis.getMember().then(data => {
-            // }).catch(err => {
-            //     Vue.$toast.show({
-            //         toastText: '服务异常，请稍后重试'
-            //     });
-            //     setTimeout(function () {
-            //         Vue.$toast.close();
-            //     }, 2000)
-            // });
-            commit('setMember', getValue(member, 'result'));
+        // 调接口数据
+        getData({commit}, param) {
+            apis[param.action]().then(data => {
+                if(data.code == 0){
+                    param.fn && param.fn(getValue(data, 'result'));
+                }else {
+
+                }
+            }).catch(err => {
+                Vue.$toast.show({
+                    toastText: '服务异常，请稍后重试'
+                });
+                setTimeout(function () {
+                    Vue.$toast.close();
+                }, 2000)
+            });
         },
         // 热力图
         getOrderMap({commit, state}) {
             // apis.getOrderMap().then(data => {
+            //     if(data.code == 0){
+            //         commit('setOrderMap', getValue(data, 'result'));
+            //     }else {
+            //
+            //     }
             // }).catch(err => {
             //     Vue.$toast.show({
             //         toastText: '服务异常，请稍后重试'
@@ -65,7 +79,13 @@ export default {
         },
         // 目标达成
         getTargetComplete({commit}) {
-            // apis.getTransactionOrder().then(data => {
+            // apis.getTargetComplete().then(data => {
+            //     if(data.code == 0){
+            //         console.log('目标达成',getValue(data, 'result'));
+            //         commit('setTargetComplete', getValue(data, 'result'));
+            //     }else {
+            //
+            //     }
             // }).catch(err => {
             //     Vue.$toast.show({
             //         toastText: '服务异常，请稍后重试'
@@ -79,6 +99,11 @@ export default {
         // 数据总览主标题
         getMainTitle({commit}) {
             // apis.getMainTitle().then(data => {
+            //     if(data.code == 0){
+            //         commit('setMainTitle', getValue(data, 'result'));
+            //     }else {
+            //
+            //     }
             // }).catch(err => {
             //     Vue.$toast.show({
             //         toastText: '服务异常，请稍后重试'
@@ -92,6 +117,11 @@ export default {
         // 订单数实时统计
         getRealTimeOrderNumLine({commit}) {
             // apis.getRealTimeOrderNumLine().then(data => {
+            //     if(data.code == 0){
+            //         commit('setRealTimeAmountLine', getValue(data, 'result'));
+            //     }else {
+            //
+            //     }
             // }).catch(err => {
             //     Vue.$toast.show({
             //         toastText: '服务异常，请稍后重试'
@@ -105,6 +135,11 @@ export default {
         // 营业额实时统计
         getRealTimeAmountLine({commit}) {
             // apis.getRealTimeAmountLine().then(data => {
+            //     if(data.code == 0){
+            //         commit('setRealTimeOrderNumLine', getValue(data, 'result'));
+            //     }else {
+            //
+            //     }
             // }).catch(err => {
             //     Vue.$toast.show({
             //         toastText: '服务异常，请稍后重试'
@@ -118,6 +153,11 @@ export default {
         // 营业排行接口
         getBusinessRanking({commit}) {
             // apis.getBusinessRanking().then(data => {
+            //     if(data.code == 0){
+            //         commit('setBusinessRanking', getValue(data, 'result'));
+            //     }else {
+            //
+            //     }
             // }).catch(err => {
             //     Vue.$toast.show({
             //         toastText: '服务异常，请稍后重试'
@@ -132,9 +172,6 @@ export default {
     mutations: {
         ['setTransactionOrder'](state, data){
             state.transactionOrder = data;
-        },
-        ['setMember'](state, data){
-            state.member = data;
         },
         ['setOrderMap'](state, data){
             state.orderMap = data;

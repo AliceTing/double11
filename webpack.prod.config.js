@@ -16,10 +16,9 @@ let pre = process.env.pre;
 let test = process.env.test;
 let isDev = (ENV === 'development');
 //todo 修改成线上域名
-let publicPath = '//localhost/';
+let publicPath = '//bi.laiyifen.com/realtime-dashboard/';
 
-// let publicPath = '//m.lyf.edu.laiyifen.com/tianpan/';
-let outPath = path.join(__dirname, 'dist');
+let outPath = path.join(__dirname, 'target');
 
 let glob = require('glob');
 
