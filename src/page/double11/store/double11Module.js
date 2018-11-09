@@ -171,7 +171,6 @@ export default {
     mutations: {
         ['setTransactionOrder'](state, data){
             state.transactionOrder = data;
-            console.log(111,state.transactionOrder);
         },
         ['setOrderMap'](state, data){
             state.orderMap = data;

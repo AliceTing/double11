@@ -305,14 +305,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="data_md" v-for="(chartItem,index) in leftChartArr" :key="index"
-                     :style="{height: setSingleHeight + 'px'}">
-                    <h2 class="name">{{chartItem.name}}</h2>
-                    <div class="con">
-                        <div class="chart" :style="{height: (setSingleHeight - 50) + 'px'}"
-                             :id="'main'+(index+1)"></div>
-                    </div>
-                </div>
+                <businessRanking></businessRanking>
+                <orderNumber></orderNumber>
             </div>
         </div>
         <div class="wrap middle">
@@ -336,71 +330,45 @@
                     </div>
                 </div>
             </div>
-            <div class="data_md" :style="{height: setMiddleSingleHeight + 'px'}">
-                <div id="main3" :style="{height: setMiddleSingleHeight - 50 + 'px'}"></div>
-            </div>
-            <div class="data_md deal_order" :style="{height: setMiddleSingleHeight*1/3 + 'px'}">
-                <div class="con">
-                    <h2 class="name">成交订单</h2>
-                    <div class="main" id="scrollBox">
-                        <div class="list">
-                            <div class="item" v-for="(item,index) in transactionOrder"
-                                 :key="index">
-                                <div class="user">{{item.customer_id}}</div>
-                                <div class="store">{{item.storename}}</div>
-                                <div class="amount">{{item.orderamount}}</div>
-                                <div class="time">{{item.dt}}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bottom_blur"></div>
-                </div>
-            </div>
+            <orderMap></orderMap>
+            <orderList></orderList>
         </div>
         <div class="wrap right">
             <div class="inner">
-                <div class="data_md" v-for="(chartItem,index) in rightChartArr" :key="index"
-                     :style="{height: setSingleHeight + 'px'}">
-                    <h2 class="name">{{chartItem.name}}</h2>
-                    <div class="con">
-                        <div class="chart" :style="{height: (setSingleHeight - 50) + 'px'}"
-                             :id="'main'+(index+4)"></div>
-                    </div>
-                </div>
+                <member></member>
+                <salesAmount></salesAmount>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import Vue from 'vue';
     import {mapState, mapActions, mapMutations} from 'vuex';
 
     import echarts from 'echarts';
     import 'echarts/map/js/china.js';
 
+    import businessRanking from './components/businessRanking';
+    import orderNumber from './components/orderNumber';
+    import orderMap from './components/orderMap';
+    import orderList from './components/orderList';
+    import member from './components/member';
+    import salesAmount from './components/salesAmount';
+
     export default {
+        components: {
+            businessRanking,
+            orderNumber,
+            orderMap,
+            orderList,
+            member,
+            salesAmount
+        },
         data() {
             return {
                 realTime: '00:00:00',
-                leftChartArr: [{
-                    name: '营业排行榜'
-                }, {
-                    name: '订单实时统计'
-                }],
-                rightChartArr: [{
-                    'name': '会员等级占比'
-                }, {
-                    'name': '新老客占比'
-                }, {
-                    'name': '营业额实时统计'
-                }],
                 refreshTime: 10,
-                singleBoxHeight: '',
                 mainInfo: {},
-                transactionOrder: {
-                    transOrderInfo: []
-                },
                 targetComplete: {
                     occuRate: '',
                     target: '',
@@ -408,46 +376,20 @@
                     increaseRate: ''
                 },
                 mainTitleInterval: null,
-                orderMoveInterval: null
             }
         },
         created() {
             let me = this;
             // 实时时钟显示
             me.getRealTime();
-
-            // 调接口取数据
-            // me.getTargetComplete();
-            // me.getBusinessRanking();
-            // me.getOrderMap();
-            //  me.getTransactionOrder();
-            // me.getRealTimeOrderNumLine();
-            // me.getRealTimeAmountLine();
-
         },
         mounted() {
             let me = this;
 
             // 初始化图表
 
-            // 营业排行
-            me.businessRankingChart();
-
-            // 会员
-            me.vipDistributionChart();
-            me.newOldRatioChart();
-
-            // 订单实时统计
-            me.orderStatisticsChart();
-
-            // 营业额实时统计
-            me.salesStatisticsChart();
-
-            // 热力图
-            me.orderHeatChart();
-
             // 数据总览
-            //me.getMainTitle();
+            me.getMainTitle();
 
             // 定时刷新数据
             me.intervalData();
@@ -455,14 +397,8 @@
         methods: {
             ...mapActions([
                 'getData',
-                'getTransactionOrder',
-                'getMember',
-                'getOrderMap',
                 'getTargetComplete',
                 'getMainTitle',
-                'getRealTimeOrderNumLine',
-                'getRealTimeAmountLine',
-                'getBusinessRanking'
             ]),
             // 实时时钟显示
             getRealTime() {
@@ -483,410 +419,6 @@
                     t = setTimeout(time, 1000);
                 }
             },
-            // 营业排行
-            businessRankingChart() {
-                let me = this;
-                me.initChart(document.getElementById('main1'), {
-                    color: ["#009dc2", "#7e5dd7"],
-                    tooltip: {
-                        show: false,
-                        trigger: "axis",
-                        axisPointer: {
-                            type: "shadow"
-                        },
-                        backgroundColor: "#f60",
-                    },
-                    legend: {
-                        data: [
-                            "actual",
-                            "target"
-                        ],
-                        y: "bottom",
-                        textStyle: {
-                            color: '#69b7ff'
-                        }
-                    },
-                    xAxis: [
-                        {
-                            type: "category",
-                            axisLabel: {
-                                show: true,
-                                textStyle: {
-                                    color: '#69b7ff',
-                                    fontSize: '14'
-                                }
-                            }
-                        }
-                    ],
-                    yAxis: [
-                        {
-                            type: "value",
-                            axisLabel: {
-                                show: true,
-                                textStyle: {
-                                    color: '#69b7ff',
-                                    fontSize: '14'
-                                },
-                                formatter: function (val, index) {
-                                    return (parseFloat(val) / 10000) + "W";
-                                }
-                            },
-                            splitLine: {
-                                lineStyle: {
-                                    type: 'dashed',
-                                    color: ['#fff'],
-                                    opacity: 0.3
-                                }
-                            }
-                        },
-                        {
-                            type: "value",
-                            show: false
-                        }
-                    ],
-                    series: [
-                        {
-                            name: "达成率",
-                            type: "line",
-                            seriesLayoutBy: "row",
-                            yAxisIndex: 1,
-                            encode: {
-                                y: 3
-                            },
-                            smooth: true,
-                            lineStyle: {
-                                width: 3
-                            }
-                        },
-                        {
-                            name: "actual",
-                            type: "bar",
-                            seriesLayoutBy: "row",
-                            encode: {
-                                x: 0,
-                                y: "actual"
-                            }
-                        },
-                        {
-                            name: "target",
-                            type: "bar",
-                            seriesLayoutBy: "row",
-                            encode: {
-                                x: 0,
-                                y: "target"
-                            }
-                        }
-                    ]
-                });
-            },
-            // 订单实时统计
-            orderStatisticsChart() {
-                let me = this;
-                let opt = {
-                    color: ["#009dc2", "#7e5dd7"],
-                    tooltip: {
-                        show: true,
-                        trigger: "axis"
-                    },
-                    xAxis: [{
-                        type: "category",
-                        boundaryGap: true,
-                        axisLabel: {
-                            show: true,
-                            textStyle: {
-                                color: '#69b7ff',
-                                fontSize: '14'
-                            }
-                        }
-                    }],
-                    yAxis: [{
-                        type: "value",
-                        splitLine: {
-                            lineStyle: {
-                                type: 'dashed',
-                                color: ['#fff'],
-                                opacity: 0.3
-                            }
-                        },
-                        axisLabel: {
-                            show: true,
-                            textStyle: {
-                                color: '#69b7ff',
-                                fontSize: '14'
-                            }
-                        }
-                    }],
-                    legend: {
-                        data: [
-                            "今日订单",
-                            //"昨日订单"
-                        ],
-                        y: "bottom",
-                        textStyle: {
-                            color: '#69b7ff'
-                        }
-                    },
-                    series: [
-                        {
-                            name: "今日订单",
-                            type: "line",
-                            smooth: true,
-                            itemStyle: {
-                                normal: {
-                                    areaStyle: {
-                                        type: "default"
-                                    }
-                                }
-                            },
-                            lineStyle: {
-                                width: 3
-                            },
-                            seriesLayoutBy: "row",
-                            areaStyle: {
-                                normal: {
-                                    color: new echarts.graphic.LinearGradient(
-                                        0, 0, 0, 1,
-                                        [
-                                            {offset: 0, color: 'rgba(127,93,215,1)'},
-                                            {offset: 1, color: 'rgba(255,255,255,0)'}
-                                        ]
-                                    )
-                                }
-                            },
-                        },
-                        // {
-                        //     name: "昨日订单",
-                        //     type: "line",
-                        //     smooth: true,
-                        //     itemStyle: {
-                        //         normal: {
-                        //             areaStyle: {
-                        //                 type: "default"
-                        //             }
-                        //         }
-                        //     },
-                        //     seriesLayoutBy: "row"
-                        // }
-                    ]
-                };
-                me.initChart(document.getElementById('main2'), opt);
-
-            },
-            // vip分布/会员占比
-            vipDistributionChart() {
-                let me = this;
-                let opt = {
-                    color: ["#009dc2", "#7e5dd7", "#5113b1", "#4702fb", "#0a84a1", "#7b4cf4"],
-                    tooltip: {
-                        show: false,
-                        trigger: "item"
-                    },
-                    legend: {
-                        orient: "horizontal",
-                        x: "center",
-                        y: "bottom",
-                        textStyle: {
-                            color: '#3D3E86'
-                        }
-                    },
-                    series: [{
-                        type: "pie",
-                        selectedMode: "multiple",
-                        center: [
-                            "50%",
-                            "40%"
-                        ],
-                        radius: [
-                            "50%",
-                            "75%"
-                        ],
-                        label: {
-                            show: true,
-                            position: 'outside',
-                            formatter: "{b}:{d}%",
-                            fontSize: 24
-                        },
-                        data: []
-                    }
-                    ]
-                };
-                me.initChart(document.getElementById('main4'), opt);
-
-            },
-            // 新老客占比
-            newOldRatioChart() {
-                let me = this;
-                let opt = {
-                    color: ["#009dc2", "#7e5dd7", "#5113b1"],
-                    tooltip: {
-                        formatter: "{b}:{c}({d}%)",
-                        show: true
-                    },
-                    legend: {
-                        orient: "horizontal",
-                        x: "center",
-                        y: "bottom",
-                        textStyle: {
-                            color: '#3D3E86'
-                        }
-                    },
-                    series: [
-                        {
-                            type: "pie",
-                            selectedMode: "multiple",
-                            radius: [
-                                "50%",
-                                "75%"
-                            ],
-                            label: {
-                                show: true,
-                                position: 'outside',
-                                formatter: "{b}:{d}%",
-                                fontSize: 24
-                            },
-                            data: []
-                        }
-                    ]
-                };
-
-                me.initChart(document.getElementById('main5'), opt);
-            },
-            // 营业额实时统计
-            salesStatisticsChart() {
-                let me = this;
-                let opt = {
-                    color: ["#009dc2", "#7e5dd7"],
-                    tooltip: {
-                        show: true,
-                        trigger: "axis"
-                    },
-                    xAxis: [{
-                        type: "category",
-                        boundaryGap: true,
-                        axisLabel: {
-                            show: true,
-                            textStyle: {
-                                color: '#69b7ff',
-                                fontSize: '14'
-                            }
-                        }
-                    }],
-                    yAxis: [{
-                        type: "value",
-                        splitLine: {
-                            lineStyle: {
-                                type: 'dashed',
-                                color: ['#fff'],
-                                opacity: 0.3
-                            }
-                        },
-                        axisLabel: {
-                            show: true,
-                            textStyle: {
-                                color: '#69b7ff',
-                                fontSize: '14'
-                            },
-                            formatter: function (val, index) {
-                                return (parseFloat(val) / 10000) + "W";
-                            }
-                        }
-                    }],
-                    legend: {
-                        data: [
-                            "now",
-                            //"lastyear"
-                        ],
-                        y: "bottom",
-                        textStyle: {
-                            color: '#69b7ff'
-                        }
-                    },
-                    series: [
-                        {
-                            name: "now",
-                            type: "line",
-                            smooth: true,
-                            seriesLayoutBy: "row",
-                            encode: {
-                                x: 0,
-                                y: 1
-                            },
-                            lineStyle: {
-                                width: 3
-                            }
-                        },
-                        // {
-                        //     name: "lastyear",
-                        //     type: "line",
-                        //     smooth: true,
-                        //     seriesLayoutBy: "row"
-                        // }
-                    ]
-                };
-                me.initChart(document.getElementById('main6'), opt);
-
-            },
-            // 订单热力图
-            orderHeatChart() {
-                let me = this;
-                let opt = {
-                    geo: {
-                        map: "china",
-                        label: {
-                            //show: true,
-                            fontSize: 10
-                        },
-                        itemStyle: {
-                            normal: {
-                                areaColor: "#1359a8",
-                                borderColor: "#5013b1"
-                            }
-                        },
-                        zoom: 1
-                    },
-                    tooltip: {
-                        trigger: "item"
-                    },
-                    series: [{
-                        name: "订单",
-                        type: "scatter",
-                        coordinateSystem: "geo",
-                        itemStyle: {
-                            color: "#7151ae"
-                        },
-                        symbolSize: function (val) {
-                            let len = parseInt(val[2]).toString().length;
-                            return (val[2] / Math.pow(10, len)) + 8;
-                        }
-                    }, {
-                        name: "最新",
-                        type: "effectScatter",
-                        coordinateSystem: "geo",
-                        symbolSize: 20,
-                        label: {
-                            normal: {
-                                formatter: "{b}",
-                                position: "right",
-                                show: true
-                            }
-                        },
-                        itemStyle: {
-                            normal: {
-                                color: "#c3b450",
-                                shadowBlur: 10,
-                                shadowColor: "#333"
-                            }
-                        },
-                        showEffectOn: "render",
-                        rippleEffect: {
-                            brushType: "stroke"
-                        },
-                        zlevel: 1
-                    }]
-                };
-                me.initChart(document.getElementById('main3'), opt);
-
-            },
             // 初始化图表
             initChart(el, opts, type) {
                 let me = this;
@@ -895,298 +427,6 @@
                     myChart.setOption(opts);
                     return myChart;
                 }
-            },
-            //订单列表循环滚动
-            transactionOrderMove() {
-                let me = this;
-                let area = document.getElementById('scrollBox');
-                let lHeight = 40;
-                let time = 50;
-                area.innerHTML += area.innerHTML;
-                area.scrollTop = 0;
-                let sh = 0;
-                let currentStore = me.transactionOrder;
-                let result = [],
-                    i = 0, len, val, lnglat;
-                let timer;
-
-                len = currentStore.length;
-
-                let myChart = echarts.getInstanceByDom(document.getElementById("main3"));
-                let opts = myChart.getOption();
-
-                let date=new Date();
-
-                let fn = {
-                    scrollMove: function () {
-
-                        if((new Date()-date)>8*1000){
-                            clearInterval(timer);
-                            return;
-                        }
-                        sh++;
-                        area.scrollTop = sh;
-                        timer = setInterval(fn.scrollUp, time);
-                    },
-                    scrollUp: function () {
-                        if (Math.ceil(area.scrollTop) % lHeight == 0) {//滚动一行后，延时2秒
-                            clearInterval(timer);
-                            fn.setMap();
-                            setTimeout(fn.scrollMove, 1000);
-                        } else {
-                            sh++;
-                            area.scrollTop = sh;
-                            if (area.scrollTop >= area.scrollHeight / 2) {    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
-                                area.scrollTop = 0;
-                                sh = 0;
-                            }
-                        }
-                    },
-                    setMap: function () {
-                        result = [];
-                        for (; i < len;) {
-                            val = currentStore[i];
-                            lnglat = val["position"].split(',');
-                            if (lnglat.toString() != "0,0") {
-                                result.push({
-                                    name: val["storename"],
-                                    value: lnglat.concat(val["orderamount"])
-                                });
-                                i++;
-                                break;
-                            }
-                            i++;
-                        }
-                        if (i == len) i = 0;
-                        opts.series[1].data = result;
-                        myChart.setOption(opts);
-                    }
-                };
-                setTimeout(fn.scrollMove, 1000);//延迟2秒后执行scrollMove
-            },
-            //环形图定时展示
-            pieIntervalShow(myChart) {
-                let currentIndex = -1;
-                let showTip = function () {
-                    let dataLen = myChart.getOption().series[0].data.length;
-                    // 取消之前高亮的图形
-                    myChart.dispatchAction({
-                        type: 'downplay',
-                        seriesIndex: 0,
-                        dataIndex: currentIndex
-                    });
-                    currentIndex = (currentIndex + 1) % dataLen;
-                    // 高亮当前图形
-                    myChart.dispatchAction({
-                        type: 'highlight',
-                        seriesIndex: 0,
-                        dataIndex: currentIndex
-                    });
-                    // 显示 tooltip
-                    myChart.dispatchAction({
-                        type: 'showTip',
-                        seriesIndex: 0,
-                        dataIndex: currentIndex
-                    });
-
-                    return showTip;
-                }
-                setInterval(showTip(), 5000);
-            },
-            // 营业排行数据刷新
-            refreshBusinessRanking() {
-                let me = this;
-                let province = [""],
-                    target = ["target"],
-                    actual = ["actual"],
-                    rate = [""],
-                    i = 0,
-                    len, data, val, myChart, opts;
-
-                //调用api请求数据，没有则直接返回
-                // let lineData = me.businessRanking;
-                // if (!lineData) return;
-                me.getData({
-                    action: 'getBusinessRanking',
-                    fn(data) {
-                        myChart = echarts.getInstanceByDom(document.getElementById("main1"));
-                        opts = myChart.getOption();
-
-                        data = data.businessRanking;
-                        len = data.length;
-                        for (; i < len; i++) {
-                            if (data[i]["province"]) {
-                                province.push(data[i]["province"]);
-                                actual.push(data[i]["saleAmount"]);
-                                target.push(data[i]["targetAmount"]);
-                                val = data[i]["targetRate"];
-                                rate.push(val.substr(0, val.length - 1));
-                            }
-                        }
-                        opts.dataset = {
-                            source: [province, actual, target, rate]
-                        };
-                        myChart.setOption(opts);
-                    }
-                });
-
-            },
-            //订单实时统计数据刷新
-            refreshRealTimeOrderNumLine() {
-                let me = this, data, time = [], val = [], myChart, opts;
-
-                //调用api请求数据，没有则直接返回
-                me.getData({
-                    action: 'getRealTimeOrderNumLine',
-                    fn(data) {
-                        if (!data) return;
-                        myChart = echarts.getInstanceByDom(document.getElementById("main2"));
-                        opts = myChart.getOption();
-
-                        Object.keys(data).forEach(key => {
-                            time.push(key);
-                            val.push(data[key]);
-                        });
-                        opts.dataset = {
-                            source: [time, val]
-                        };
-                        myChart.setOption(opts);
-                        myChart.dispatchAction({
-                            type: 'showTip',
-                            seriesIndex: 0,
-                            dataIndex: time.length - 2
-                        });
-                    }
-                });
-
-            },
-            //营业额实时统计数据刷新
-            refreshRealTimeAmountLine() {
-                let me = this, time = [], val = [], data, myChart, opts;
-
-                //调用api请求数据，没有则直接返回
-
-                me.getData({
-                    action: 'getRealTimeAmountLine',
-                    fn(data) {
-                        if (!data) return;
-
-                        myChart = echarts.getInstanceByDom(document.getElementById("main6"));
-                        opts = myChart.getOption();
-
-                        Object.keys(data).forEach(key => {
-                            time.push(key);
-                            val.push(data[key]);
-                        });
-
-                        opts.dataset = {
-                            source: [time, val]
-                        };
-                        myChart.setOption(opts);
-                        myChart.dispatchAction({
-                            type: 'showTip',
-                            seriesIndex: 0,
-                            dataIndex: time.length - 2
-                        });
-                    }
-                });
-
-
-            },
-            // 地图刷新
-            refreshHeatMap() {
-                let me = this;
-                let data, i = 0, len,
-                    val, result = [], lnglat = [], allStore,
-                    currentStore,
-                    myChart, opts;
-
-                if (me.mapInterval) {
-                    clearInterval(me.mapInterval)
-                }
-
-                myChart = echarts.getInstanceByDom(document.getElementById("main3"));
-                opts = myChart.getOption();
-
-                me.getData({
-                    action: 'getOrderMap',
-                    fn(data) {
-                        allStore = data.orderMapInfos;
-                        len = allStore.length;
-                        for (; i < len; i++) {
-                            val = allStore[i];
-                            lnglat = val["position"].split(',');
-                            if (lnglat.toString() != "0,0") {
-                                result.push({
-                                    name: "",
-                                    value: lnglat.concat(val["amount"])
-                                });
-                            }
-                        }
-                        opts.series[0].data = result;
-                        myChart.setOption(opts);
-                    }
-                });
-
-                me.getData({
-                    action: 'getTransactionOrder',
-                    fn(data) {
-                        me.transactionOrder = data.transOrderInfo;
-                        // currentStore = data.transOrderInfo;
-                        // i = 0;
-                        // len = currentStore.length;
-                        // let fn = function () {
-                        //     result = [];
-                        //     for (; i < len;) {
-                        //         val = currentStore[i];
-                        //         lnglat = val["position"].split(',');
-                        //         if (lnglat.toString() != "0,0") {
-                        //             result.push({
-                        //                 name: val["storename"],
-                        //                 value: lnglat.concat(val["orderamount"])
-                        //             });
-                        //             i++;
-                        //             break;
-                        //         }
-                        //         i++;
-                        //     }
-                        //     if (i == len) i = 0;
-                        //     opts.series[1].data = result;
-                        //     myChart.setOption(opts);
-                        //
-                        //     return fn;
-                        // }
-                        // me.mapInterval = setInterval(fn(), 2000);
-
-                        var time = setTimeout(function () {
-                            clearTimeout(time);
-                            me.transactionOrderMove();
-                        }, 0);
-                    }
-                });
-            },
-            //会员刷新
-            refreshMember() {
-                let me = this;
-                let myChart, opts;
-                //调用api请求数据，没有则直接返回
-                me.getData({
-                    action: 'getMember',
-                    fn(data) {
-                        //会员等级main4
-                        myChart = echarts.getInstanceByDom(document.getElementById("main4"));
-                        opts = myChart.getOption();
-                        opts.series[0].data = data.memberLevel || [];
-                        myChart.setOption(opts);
-                        // me.pieIntervalShow(myChart);
-
-                        //新老会员main5
-                        myChart = echarts.getInstanceByDom(document.getElementById("main5"));
-                        opts = myChart.getOption();
-                        opts.series[0].data = data.memberDistribute || [];
-                        myChart.setOption(opts);
-                    }
-                });
             },
             //中央数据
             refreshMainTitle() {
@@ -1294,15 +534,8 @@
                 let me = this;
                 let refreshData = function () {
 
-
-                    me.refreshBusinessRanking();
-                    me.refreshRealTimeAmountLine();
-                    me.refreshRealTimeOrderNumLine();
-                    me.refreshMember();
                     me.refreshMainTitle();
                     me.refreshTargetComplete();
-                    me.refreshHeatMap();
-
 
                     return refreshData;
                 };
