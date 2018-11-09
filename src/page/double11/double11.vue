@@ -26,11 +26,11 @@
             border-radius: 10px;
         }
         .left .inner .data_md:first-child,
-        .right .inner .data_md:first-child{
+        .right .inner .data_md:first-child {
             padding-top: 20px;
         }
-        .left .inner .data_md:first-child{
-            .con{
+        .left .inner .data_md:first-child {
+            .con {
                 height: 100%;
                 margin-top: 50%;
                 transform: translateY(-50%);
@@ -111,12 +111,12 @@
                     box-sizing: border-box;
                     background-color: rgba(60, 46, 213, .14);
                 }
-                .main{
+                .main {
                     flex: 1;
                     overflow: hidden;
-                    scroll-y:auto;
+                    scroll-y: auto;
                 }
-                .list{
+                .list {
                 }
                 .name {
                     margin-bottom: 15px;
@@ -168,8 +168,9 @@
                     color: #fff;
                     font-size: 30px;
                     text-align: center;
+                    transition: all 0.2s;
                     &:before,
-                    &:after{
+                    &:after {
                         content: '';
                         position: absolute;
                         left: 0;
@@ -180,11 +181,11 @@
                         border-style: solid dashed dashed dashed;
                         border-width: 14px 10px;
                     }
-                    &:before{
+                    &:before {
                         bottom: -30px;
                         border-color: #593AFF transparent transparent transparent;
                     }
-                    &:after{
+                    &:after {
                         bottom: -27px;
                         border-color: #3E24A7 transparent transparent transparent;
                     }
@@ -209,6 +210,7 @@
                         bottom: 0;
                         right: 0;
                         background-color: #180a56;
+                        transition: all 0.2s;
                     }
                 }
             }
@@ -230,14 +232,14 @@
                     .unit {
                         font-size: 22px;
                     }
-                    .up{
+                    .up {
                         position: relative;
                         display: inline-block;
                         width: 8px;
                         height: 15px;
                         margin-left: 10px;
                         background-color: #CB2106;
-                        &:before{
+                        &:before {
                             content: '';
                             position: absolute;
                             top: -18px;
@@ -274,25 +276,29 @@
                         <div class="goal_reach">
                             <div class="box">
                                 <div class="bar">
-                                    <div class="rate" :style="{left: goldReach.occuRate}">{{goldReach.occuRate}}</div>
+                                    <div class="rate" :style="{left: targetComplete.occuRate}">
+                                        {{targetComplete.occuRate}}
+                                    </div>
                                     <div class="linear"></div>
                                     <div class="cover"
-                                         :style="{width: (100 - goldReach.occuRate.substr(0,goldReach.occuRate.length-1)) + '%'}"></div>
+                                         :style="{width: (100 - targetComplete.occuRate.substr(0,targetComplete.occuRate.length-1)) + '%'}"></div>
                                 </div>
                             </div>
                             <ul class="data">
                                 <li>
                                     <h4>目标</h4>
-                                    <div class="value">{{goldReach.target}}<span class="unit">万</span></div>
+                                    <div class="value">{{targetComplete.target}}<span class="unit">万</span></div>
                                 </li>
                                 <li>
                                     <h4>当前</h4>
-                                    <div class="value">{{goldReach.atPresent}}<span class="unit">万</span></div>
+                                    <div class="value">{{targetComplete.atPresent}}<span class="unit">万</span></div>
                                 </li>
                                 <li>
                                     <h4>同比增长</h4>
-                                    <div class="value">{{goldReach.increaseRate.substr(0,goldReach.increaseRate.length -
-                                        1)}}<span class="unit">%</span><span class="up" v-if="parseFloat(goldReach.increaseRate) > 0"></span>
+                                    <div class="value">
+                                        {{targetComplete.increaseRate.substr(0,targetComplete.increaseRate.length -
+                                        1)}}<span class="unit">%</span><span class="up"
+                                                                             v-if="parseFloat(targetComplete.increaseRate) > 0"></span>
                                     </div>
                                 </li>
                             </ul>
@@ -338,7 +344,8 @@
                     <h2 class="name">成交订单</h2>
                     <div class="main" id="scrollBox">
                         <div class="list">
-                            <div class="item" v-for="(item,index) in transactionOrder.transOrderInfo" :key="index">
+                            <div class="item" v-for="(item,index) in transactionOrder"
+                                 :key="index">
                                 <div class="user">{{item.customer_id}}</div>
                                 <div class="store">{{item.storename}}</div>
                                 <div class="amount">{{item.orderamount}}</div>
@@ -376,16 +383,6 @@
         data() {
             return {
                 realTime: '00:00:00',
-                customers: 11,
-                totalPrice: 10223333,
-                orderNumber: 34859,
-                unitPrice: 80,
-                goldReach: {
-                    occuRate: '90%',
-                    target: '200000',
-                    atPresent: '150000',
-                    increaseRate: '15%'
-                },
                 leftChartArr: [{
                     name: '营业排行榜'
                 }, {
@@ -398,10 +395,20 @@
                 }, {
                     'name': '营业额实时统计'
                 }],
-                refreshTime:5 * 60,
+                refreshTime: 10,
                 singleBoxHeight: '',
-                mainInfo:{}
-
+                mainInfo: {},
+                transactionOrder: {
+                    transOrderInfo: []
+                },
+                targetComplete: {
+                    occuRate: '',
+                    target: '',
+                    atPresent: '',
+                    increaseRate: ''
+                },
+                mainTitleInterval: null,
+                orderMoveInterval: null
             }
         },
         created() {
@@ -410,12 +417,12 @@
             me.getRealTime();
 
             // 调接口取数据
-            me.getTargetComplete();
-            me.getBusinessRanking();
-            me.getOrderMap();
-            me.getTransactionOrder();
-            me.getRealTimeOrderNumLine();
-            me.getRealTimeAmountLine();
+            // me.getTargetComplete();
+            // me.getBusinessRanking();
+            // me.getOrderMap();
+            //  me.getTransactionOrder();
+            // me.getRealTimeOrderNumLine();
+            // me.getRealTimeAmountLine();
 
         },
         mounted() {
@@ -440,7 +447,7 @@
             me.orderHeatChart();
 
             // 数据总览
-            me.getMainTitle();
+            //me.getMainTitle();
 
             // 定时刷新数据
             me.intervalData();
@@ -520,15 +527,15 @@
                                     color: '#69b7ff',
                                     fontSize: '14'
                                 },
-                                formatter:function (val,index) {
-                                    return (parseFloat(val)/10000)+"W";
+                                formatter: function (val, index) {
+                                    return (parseFloat(val) / 10000) + "W";
                                 }
                             },
-                            splitLine:{
+                            splitLine: {
                                 lineStyle: {
                                     type: 'dashed',
                                     color: ['#fff'],
-                                    opacity:0.3
+                                    opacity: 0.3
                                 }
                             }
                         },
@@ -547,8 +554,8 @@
                                 y: 3
                             },
                             smooth: true,
-                            lineStyle:{
-                                width:3
+                            lineStyle: {
+                                width: 3
                             }
                         },
                         {
@@ -594,11 +601,11 @@
                     }],
                     yAxis: [{
                         type: "value",
-                        splitLine:{
+                        splitLine: {
                             lineStyle: {
                                 type: 'dashed',
                                 color: ['#fff'],
-                                opacity:0.3
+                                opacity: 0.3
                             }
                         },
                         axisLabel: {
@@ -631,8 +638,8 @@
                                     }
                                 }
                             },
-                            lineStyle:{
-                                width:3
+                            lineStyle: {
+                                width: 3
                             },
                             seriesLayoutBy: "row",
                             areaStyle: {
@@ -685,7 +692,7 @@
                     series: [{
                         type: "pie",
                         selectedMode: "multiple",
-                        center:[
+                        center: [
                             "50%",
                             "40%"
                         ],
@@ -697,7 +704,7 @@
                             show: true,
                             position: 'outside',
                             formatter: "{b}:{d}%",
-                            fontSize:24
+                            fontSize: 24
                         },
                         data: []
                     }
@@ -735,7 +742,7 @@
                                 show: true,
                                 position: 'outside',
                                 formatter: "{b}:{d}%",
-                                fontSize:24
+                                fontSize: 24
                             },
                             data: []
                         }
@@ -766,11 +773,11 @@
                     }],
                     yAxis: [{
                         type: "value",
-                        splitLine:{
+                        splitLine: {
                             lineStyle: {
                                 type: 'dashed',
                                 color: ['#fff'],
-                                opacity:0.3
+                                opacity: 0.3
                             }
                         },
                         axisLabel: {
@@ -779,8 +786,8 @@
                                 color: '#69b7ff',
                                 fontSize: '14'
                             },
-                            formatter:function (val,index) {
-                                return (parseFloat(val)/10000)+"W";
+                            formatter: function (val, index) {
+                                return (parseFloat(val) / 10000) + "W";
                             }
                         }
                     }],
@@ -800,12 +807,12 @@
                             type: "line",
                             smooth: true,
                             seriesLayoutBy: "row",
-                            encode:{
-                                x:0,
-                                y:1
+                            encode: {
+                                x: 0,
+                                y: 1
                             },
-                            lineStyle:{
-                                width:3
+                            lineStyle: {
+                                width: 3
                             }
                         },
                         // {
@@ -829,13 +836,13 @@
                             //show: true,
                             fontSize: 10
                         },
-                        itemStyle:{
-                            normal:{
-                                areaColor:"#1359a8",
-                                borderColor:"#5013b1"
+                        itemStyle: {
+                            normal: {
+                                areaColor: "#1359a8",
+                                borderColor: "#5013b1"
                             }
                         },
-                        zoom:1.5
+                        zoom: 1
                     },
                     tooltip: {
                         trigger: "item"
@@ -848,17 +855,14 @@
                             color: "#7151ae"
                         },
                         symbolSize: function (val) {
-                            let len=parseInt(val[2]).toString().length;
-                            return (val[2] / Math.pow(10,len)) + 8;
+                            let len = parseInt(val[2]).toString().length;
+                            return (val[2] / Math.pow(10, len)) + 8;
                         }
                     }, {
                         name: "最新",
                         type: "effectScatter",
                         coordinateSystem: "geo",
-                        symbolSize: function (val) {
-                            let len=parseInt(val[2]).toString().length;
-                            return (val[2] / Math.pow(10,len)) + 8;
-                        },
+                        symbolSize: 20,
                         label: {
                             normal: {
                                 formatter: "{b}",
@@ -881,7 +885,7 @@
                     }]
                 };
                 me.initChart(document.getElementById('main3'), opt);
-                me.transactionOrderMove();
+
             },
             // 初始化图表
             initChart(el, opts, type) {
@@ -893,18 +897,33 @@
                 }
             },
             //订单列表循环滚动
-            transactionOrderMove(){
-                let area =document.getElementById('scrollBox');
+            transactionOrderMove() {
+                let me = this;
+                let area = document.getElementById('scrollBox');
                 let lHeight = 40;
                 let time = 50;
-                area.innerHTML+=area.innerHTML;
+                area.innerHTML += area.innerHTML;
                 area.scrollTop = 0;
+                let sh = 0;
+                let currentStore = me.transactionOrder;
+                let result = [],
+                    i = 0, len, val, lnglat;
                 let timer;
-                let sh=0;
+
+                len = currentStore.length;
+
+                let myChart = echarts.getInstanceByDom(document.getElementById("main3"));
+                let opts = myChart.getOption();
+
+                let date=new Date();
 
                 let fn = {
-
                     scrollMove: function () {
+
+                        if((new Date()-date)>8*1000){
+                            clearInterval(timer);
+                            return;
+                        }
                         sh++;
                         area.scrollTop = sh;
                         timer = setInterval(fn.scrollUp, time);
@@ -912,7 +931,8 @@
                     scrollUp: function () {
                         if (Math.ceil(area.scrollTop) % lHeight == 0) {//滚动一行后，延时2秒
                             clearInterval(timer);
-                            setTimeout(fn.scrollMove, 2000);
+                            fn.setMap();
+                            setTimeout(fn.scrollMove, 1000);
                         } else {
                             sh++;
                             area.scrollTop = sh;
@@ -921,15 +941,33 @@
                                 sh = 0;
                             }
                         }
+                    },
+                    setMap: function () {
+                        result = [];
+                        for (; i < len;) {
+                            val = currentStore[i];
+                            lnglat = val["position"].split(',');
+                            if (lnglat.toString() != "0,0") {
+                                result.push({
+                                    name: val["storename"],
+                                    value: lnglat.concat(val["orderamount"])
+                                });
+                                i++;
+                                break;
+                            }
+                            i++;
+                        }
+                        if (i == len) i = 0;
+                        opts.series[1].data = result;
+                        myChart.setOption(opts);
                     }
                 };
-
-                setTimeout(fn.scrollMove,2000);//延迟2秒后执行scrollMove
+                setTimeout(fn.scrollMove, 1000);//延迟2秒后执行scrollMove
             },
             //环形图定时展示
             pieIntervalShow(myChart) {
                 let currentIndex = -1;
-                let showTip=function(){
+                let showTip = function () {
                     let dataLen = myChart.getOption().series[0].data.length;
                     // 取消之前高亮的图形
                     myChart.dispatchAction({
@@ -966,79 +1004,94 @@
                     len, data, val, myChart, opts;
 
                 //调用api请求数据，没有则直接返回
-                let lineData = me.businessRanking;
-                if (!lineData) return;
+                // let lineData = me.businessRanking;
+                // if (!lineData) return;
+                me.getData({
+                    action: 'getBusinessRanking',
+                    fn(data) {
+                        myChart = echarts.getInstanceByDom(document.getElementById("main1"));
+                        opts = myChart.getOption();
 
-                myChart = echarts.getInstanceByDom(document.getElementById("main1"));
-                opts = myChart.getOption();
-
-                data = lineData.businessRanking;
-                len = data.length;
-                for (; i < len; i++) {
-                    if (data[i]["province"]) {
-                        province.push(data[i]["province"]);
-                        actual.push(data[i]["saleAmount"]);
-                        target.push(data[i]["targetAmount"]);
-                        val = data[i]["targetRate"];
-                        rate.push(val.substr(0, val.length - 1));
+                        data = data.businessRanking;
+                        len = data.length;
+                        for (; i < len; i++) {
+                            if (data[i]["province"]) {
+                                province.push(data[i]["province"]);
+                                actual.push(data[i]["saleAmount"]);
+                                target.push(data[i]["targetAmount"]);
+                                val = data[i]["targetRate"];
+                                rate.push(val.substr(0, val.length - 1));
+                            }
+                        }
+                        opts.dataset = {
+                            source: [province, actual, target, rate]
+                        };
+                        myChart.setOption(opts);
                     }
-                }
-                opts.dataset={
-                    source:[province, actual, target, rate]
-                };
-                myChart.setOption(opts);
+                });
+
             },
             //订单实时统计数据刷新
             refreshRealTimeOrderNumLine() {
-                let me = this, data, time=[],val=[], myChart, opts;
+                let me = this, data, time = [], val = [], myChart, opts;
 
                 //调用api请求数据，没有则直接返回
-                data = me.realTimeOrderNumLine;
-                if (!data) return;
+                me.getData({
+                    action: 'getRealTimeOrderNumLine',
+                    fn(data) {
+                        if (!data) return;
+                        myChart = echarts.getInstanceByDom(document.getElementById("main2"));
+                        opts = myChart.getOption();
 
-                myChart = echarts.getInstanceByDom(document.getElementById("main2"));
-                opts = myChart.getOption();
+                        Object.keys(data).forEach(key => {
+                            time.push(key);
+                            val.push(data[key]);
+                        });
+                        opts.dataset = {
+                            source: [time, val]
+                        };
+                        myChart.setOption(opts);
+                        myChart.dispatchAction({
+                            type: 'showTip',
+                            seriesIndex: 0,
+                            dataIndex: time.length - 2
+                        });
+                    }
+                });
 
-                Object.keys(data).forEach(key=>{
-                    time.push(key);
-                    val.push(data[key]);
-                });
-                opts.dataset={
-                    source:[time,val]
-                };
-                myChart.setOption(opts);
-                myChart.dispatchAction({
-                    type: 'showTip',
-                    seriesIndex: 0,
-                    dataIndex: time.length - 2
-                });
             },
             //营业额实时统计数据刷新
             refreshRealTimeAmountLine() {
-                let me = this,time=[],val=[], data, myChart, opts;
+                let me = this, time = [], val = [], data, myChart, opts;
 
                 //调用api请求数据，没有则直接返回
-                //me.getRealTimeAmountLine();
-                data = me.realTimeAmountLine;
-                if (!data) return;
 
-                myChart = echarts.getInstanceByDom(document.getElementById("main6"));
-                opts = myChart.getOption();
+                me.getData({
+                    action: 'getRealTimeAmountLine',
+                    fn(data) {
+                        if (!data) return;
 
-                Object.keys(data).forEach(key=>{
-                    time.push(key);
-                    val.push(data[key]);
+                        myChart = echarts.getInstanceByDom(document.getElementById("main6"));
+                        opts = myChart.getOption();
+
+                        Object.keys(data).forEach(key => {
+                            time.push(key);
+                            val.push(data[key]);
+                        });
+
+                        opts.dataset = {
+                            source: [time, val]
+                        };
+                        myChart.setOption(opts);
+                        myChart.dispatchAction({
+                            type: 'showTip',
+                            seriesIndex: 0,
+                            dataIndex: time.length - 2
+                        });
+                    }
                 });
 
-                opts.dataset={
-                    source:[time,val]
-                };
-                myChart.setOption(opts);
-                myChart.dispatchAction({
-                    type: 'showTip',
-                    seriesIndex: 0,
-                    dataIndex: time.length - 2
-                });
+
             },
             // 地图刷新
             refreshHeatMap() {
@@ -1048,46 +1101,69 @@
                     currentStore,
                     myChart, opts;
 
+                if (me.mapInterval) {
+                    clearInterval(me.mapInterval)
+                }
+
                 myChart = echarts.getInstanceByDom(document.getElementById("main3"));
                 opts = myChart.getOption();
 
-                allStore = me.orderMap;
-                if(allStore){
-                    data = allStore.orderMapInfos;
-                    len = data.length;
-                    for (; i < len; i++) {
-                        val = data[i];
-                        lnglat = val["position"].split(',');
-                        if (lnglat.toString() != "0,0") {
-                            result.push({
-                                name: "",
-                                value: lnglat.concat(val["amount"])
-                            });
+                me.getData({
+                    action: 'getOrderMap',
+                    fn(data) {
+                        allStore = data.orderMapInfos;
+                        len = allStore.length;
+                        for (; i < len; i++) {
+                            val = allStore[i];
+                            lnglat = val["position"].split(',');
+                            if (lnglat.toString() != "0,0") {
+                                result.push({
+                                    name: "",
+                                    value: lnglat.concat(val["amount"])
+                                });
+                            }
                         }
+                        opts.series[0].data = result;
+                        myChart.setOption(opts);
                     }
-                    opts.series[0].data = result;
-                }
+                });
 
-                currentStore = me.transactionOrder;
-                if(currentStore){
-                    data = currentStore.transOrderInfo;
-                    i = 0;
-                    len = data.length;
-                    result = [];
-                    for (; i < len; i++) {
-                        val = data[i];
-                        lnglat = val["position"].split(',');
-                        if (lnglat.toString() != "0,0") {
-                            result.push({
-                                name: val["storename"],
-                                value: lnglat.concat(val["orderamount"])
-                            });
-                        }
+                me.getData({
+                    action: 'getTransactionOrder',
+                    fn(data) {
+                        me.transactionOrder = data.transOrderInfo;
+                        // currentStore = data.transOrderInfo;
+                        // i = 0;
+                        // len = currentStore.length;
+                        // let fn = function () {
+                        //     result = [];
+                        //     for (; i < len;) {
+                        //         val = currentStore[i];
+                        //         lnglat = val["position"].split(',');
+                        //         if (lnglat.toString() != "0,0") {
+                        //             result.push({
+                        //                 name: val["storename"],
+                        //                 value: lnglat.concat(val["orderamount"])
+                        //             });
+                        //             i++;
+                        //             break;
+                        //         }
+                        //         i++;
+                        //     }
+                        //     if (i == len) i = 0;
+                        //     opts.series[1].data = result;
+                        //     myChart.setOption(opts);
+                        //
+                        //     return fn;
+                        // }
+                        // me.mapInterval = setInterval(fn(), 2000);
+
+                        var time = setTimeout(function () {
+                            clearTimeout(time);
+                            me.transactionOrderMove();
+                        }, 0);
                     }
-                    opts.series[1].data = result;
-                }
-
-                myChart.setOption(opts);
+                });
             },
             //会员刷新
             refreshMember() {
@@ -1096,78 +1172,94 @@
                 //调用api请求数据，没有则直接返回
                 me.getData({
                     action: 'getMember',
-                    fn(data){
+                    fn(data) {
                         //会员等级main4
                         myChart = echarts.getInstanceByDom(document.getElementById("main4"));
                         opts = myChart.getOption();
-                        opts.series[0].data = data.memberLevel||[];
+                        opts.series[0].data = data.memberLevel || [];
                         myChart.setOption(opts);
                         // me.pieIntervalShow(myChart);
 
                         //新老会员main5
                         myChart = echarts.getInstanceByDom(document.getElementById("main5"));
                         opts = myChart.getOption();
-                        opts.series[0].data = data.memberDistribute||[];
+                        opts.series[0].data = data.memberDistribute || [];
                         myChart.setOption(opts);
                     }
                 });
             },
             //中央数据
-            refreshMainTitle(){
+            refreshMainTitle() {
                 let me = this, count = 4,
                     numA, numO, numU, numP,
                     amount, orderNum, userNum, avgPrice,
-                    time = 1000 * 30;
+                    time = 1000 * 5;
 
                 var getNum = function (tar, des) {
-                    return Math.ceil(((parseInt(tar) - parseInt(des)) / (time / 100)));
+                    let diff = parseInt(tar) - parseInt(des);
+                    if (diff > 0) {
+                        return Math.ceil(diff / (time / 300));
+                    } else {
+                        return Math.floor(diff / (time / 300));
+                    }
                 }
                 //调用api请求数据，没有则直接返回
                 me.getData({
                     action: 'getMainTitle',
                     fn(data) {
+                        if (me.mainTitleInterval) {
+                            clearInterval(me.mainTitleInterval);
+                            me.mainTitleInterval=null;
+                        }
 
-                        amount = 15000;//parseInt(me.mainInfo.amount);
-                        orderNum = 200;
-                        userNum = 0;
-                        avgPrice = 16000;
+                        amount = parseInt(me.mainInfo.amount || 0);
+                        orderNum = parseInt(me.mainInfo.orderNum || 0);
+                        userNum = parseInt(me.mainInfo.userNum || 0);
+                        avgPrice = parseInt(me.mainInfo.avgPrice || 0);
 
-                        numA = getNum(me.mainTitle.amount, amount);
-                        numO = getNum(me.mainTitle.orderNum, orderNum);
-                        numU = getNum(me.mainTitle.userNum, userNum);
-                        numP = getNum(me.mainTitle.avgPrice, avgPrice);
+                        numA = getNum(data.mainTitle.amount, amount);
+                        numO = getNum(data.mainTitle.orderNum, orderNum);
+                        numU = getNum(data.mainTitle.userNum, userNum);
+                        numP = getNum(data.mainTitle.avgPrice, avgPrice);
 
 
-                        var t = setInterval(function () {
+                        me.mainTitleInterval = setInterval(function () {
                             count = 4;
 
                             amount += numA;
-                            if (amount >= me.mainTitle.amount) {
-                                amount = me.mainTitle.amount;
+                            if (amount >= (+data.mainTitle.amount)) {
+                                amount = (+data.mainTitle.amount);
                                 count--;
                             }
 
                             orderNum += numO;
-                            if (orderNum >= me.mainTitle.orderNum) {
-                                orderNum = me.mainTitle.orderNum;
+                            if (orderNum >= (+data.mainTitle.orderNum)) {
+                                orderNum = (+data.mainTitle.orderNum);
                                 count--;
                             }
 
-                            userNum+=numU;
-                            if (userNum >= me.mainTitle.userNum) {
-                                userNum = me.mainTitle.userNum;
+                            userNum += numU;
+                            if (userNum >= (+data.mainTitle.userNum)) {
+                                userNum = (+data.mainTitle.userNum);
                                 count--;
                             }
 
-                            avgPrice+=numP;
-                            if (avgPrice >= me.mainTitle.avgPrice) {
-                                avgPrice = me.mainTitle.avgPrice;
-                                count--;
+                            avgPrice += numP;
+                            if (numP > 0) {
+                                if (avgPrice >= (+data.mainTitle.avgPrice)) {
+                                    avgPrice = (+data.mainTitle.avgPrice);
+                                    count--;
+                                }
+                            } else {
+                                if (avgPrice <= (+data.mainTitle.avgPrice)) {
+                                    avgPrice = (+data.mainTitle.avgPrice);
+                                    count--;
+                                }
                             }
 
 
-                            if( count==0){
-                                clearInterval(t);
+                            if (count == 0) {
+                                clearInterval(me.mainTitleInterval);
                             }
 
                             me.mainInfo = {
@@ -1176,10 +1268,24 @@
                                 userNum: userNum,
                                 avgPrice: avgPrice
                             };
-                        }, 100);
+                        }, 300);
 
 
-
+                    }
+                });
+            },
+            refreshTargetComplete() {
+                let me = this;
+                me.getData({
+                    action: 'getTargetComplete',
+                    fn(data) {
+                        data = data.targetComplete;
+                        me.targetComplete = {
+                            target: (+data.targetAmount / 10000).toFixed(2),
+                            atPresent: (+data.amount / 10000).toFixed(2),
+                            increaseRate: data.targetRate,
+                            occuRate: parseFloat(+data.amount * 100 / +data.targetAmount).toFixed(2) + "%"
+                        };
                     }
                 });
             },
@@ -1188,12 +1294,15 @@
                 let me = this;
                 let refreshData = function () {
 
+
                     me.refreshBusinessRanking();
                     me.refreshRealTimeAmountLine();
                     me.refreshRealTimeOrderNumLine();
                     me.refreshMember();
-                    me.refreshHeatMap();
                     me.refreshMainTitle();
+                    me.refreshTargetComplete();
+                    me.refreshHeatMap();
+
 
                     return refreshData;
                 };
@@ -1202,21 +1311,21 @@
         },
         computed: {
             ...mapState({
-                transactionOrder: state => state.double11Module.transactionOrder,
-                member: state => state.double11Module.member,
-                orderMap: state => state.double11Module.orderMap,
-                targetComplete: state => state.double11Module.targetComplete,
-                mainTitle: state => state.double11Module.mainTitle,
-                realTimeAmountLine: state => state.double11Module.realTimeAmountLine,
-                realTimeOrderNumLine: state => state.double11Module.realTimeOrderNumLine,
-                businessRanking: state => state.double11Module.businessRanking
+                // transactionOrder: state => state.double11Module.transactionOrder,
+                //member: state => state.double11Module.member,
+                //orderMap: state => state.double11Module.orderMap,
+                //targetComplete: state => state.double11Module.targetComplete,
+                //mainTitle: state => state.double11Module.mainTitle,
+                // realTimeAmountLine: state => state.double11Module.realTimeAmountLine,
+                // realTimeOrderNumLine: state => state.double11Module.realTimeOrderNumLine,
+                // businessRanking: state => state.double11Module.businessRanking
             }),
             setSingleHeight() {
                 let innerBoxHeight = window.innerHeight - 90;
                 let singleHeight = Math.floor(parseInt((innerBoxHeight) / 3));
                 return singleHeight;
             },
-            setMiddleSingleHeight(){
+            setMiddleSingleHeight() {
                 let innerBoxHeight = window.innerHeight;
                 let middleSingleHeight = Math.floor(parseInt((innerBoxHeight) / 2));
                 return middleSingleHeight;

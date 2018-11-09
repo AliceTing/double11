@@ -14,7 +14,7 @@ import {
 
 export default {
     state: {
-        transactionOrder: [],
+        transactionOrder: {},
         member: {},
         orderMap: [],
         targetComplete: {},
@@ -26,21 +26,21 @@ export default {
     actions: {
         //成交订单滚动屏
         getTransactionOrder({commit}) {
-            // apis.getTransactionOrder().then(data => {
-            //     if(data.code == 0){
-            //         commit('setTransactionOrder', getValue(data, 'result'));
-            //     }else {
-            //
-            //     }
-            // }).catch(err => {
-            //     Vue.$toast.show({
-            //         toastText: '服务异常，请稍后重试'
-            //     });
-            //     setTimeout(function () {
-            //         Vue.$toast.close();
-            //     }, 2000)
-            // });
-            commit('setTransactionOrder', getValue(transactionOrder, 'result'));
+            apis.getTransactionOrder().then(data => {
+                if(data.code == 0){
+                    commit('setTransactionOrder', getValue(data, 'result'));
+                }else {
+
+                }
+            }).catch(err => {
+                Vue.$toast.show({
+                    toastText: '服务异常，请稍后重试'
+                });
+                setTimeout(function () {
+                    Vue.$toast.close();
+                }, 2000)
+            });
+            // commit('setTransactionOrder', getValue(transactionOrder, 'result'));
         },
         // 调接口数据
         getData({commit}, param) {
@@ -79,22 +79,21 @@ export default {
         },
         // 目标达成
         getTargetComplete({commit}) {
-            // apis.getTargetComplete().then(data => {
-            //     if(data.code == 0){
-            //         console.log('目标达成',getValue(data, 'result'));
-            //         commit('setTargetComplete', getValue(data, 'result'));
-            //     }else {
-            //
-            //     }
-            // }).catch(err => {
-            //     Vue.$toast.show({
-            //         toastText: '服务异常，请稍后重试'
-            //     });
-            //     setTimeout(function () {
-            //         Vue.$toast.close();
-            //     }, 2000)
-            // });
-            commit('setTargetComplete', getValue(targetComplete, 'result'));
+            apis.getTargetComplete().then(data => {
+                if(data.code == 0){
+                    commit('setTargetComplete', getValue(data, 'result'));
+                }else {
+
+                }
+            }).catch(err => {
+                Vue.$toast.show({
+                    toastText: '服务异常，请稍后重试'
+                });
+                setTimeout(function () {
+                    Vue.$toast.close();
+                }, 2000)
+            });
+            //commit('setTargetComplete', getValue(targetComplete, 'result'));
         },
         // 数据总览主标题
         getMainTitle({commit}) {
@@ -172,6 +171,7 @@ export default {
     mutations: {
         ['setTransactionOrder'](state, data){
             state.transactionOrder = data;
+            console.log(111,state.transactionOrder);
         },
         ['setOrderMap'](state, data){
             state.orderMap = data;
