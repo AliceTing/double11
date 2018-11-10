@@ -68,7 +68,7 @@
                         x: "center",
                         y: "bottom",
                         textStyle: {
-                            color: '#3D3E86'
+                            color: '#69b7ff'
                         }
                     },
                     series: [{
@@ -109,7 +109,7 @@
                         x: "center",
                         y: "bottom",
                         textStyle: {
-                            color: '#3D3E86'
+                            color: '#69b7ff'
                         }
                     },
                     grid:{
