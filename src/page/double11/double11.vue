@@ -56,6 +56,11 @@
                 display: block;
             }
         }
+        .left .inner{
+            .data_md:first-child{
+                overflow: visible;
+            }
+        }
     }
 </style>
 

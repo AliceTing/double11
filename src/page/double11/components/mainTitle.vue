@@ -9,7 +9,7 @@
     .title {
         margin: 20px auto;
         background: url("../../../public/assets/images/title.png") no-repeat center top;
-        background-size: 100%;
+        background-size: 100% auto;
         .real_time {
             padding-top: 60px;
             color: #fff;
@@ -43,7 +43,7 @@
 
     .data_md {
         box-sizing: border-box;
-        overflow: hidden;
+        /*overflow: hidden;*/
         .name {
             height: 30px;
             padding-left: 20px;

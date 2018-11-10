@@ -9,13 +9,14 @@
                 position: absolute;
                 top: -44px;
                 z-index: 4;
-                margin-left: -60px;
-                padding: 3px 5px;
+                width: 100px;
+                margin-left: -55px;
+                padding: 3px 0;
                 border-radius: 5px;
                 border: 2px #593AFF solid;
                 background-color: #3E24A7;
                 color: #fff;
-                font-size: 24px;
+                font-size: 22px;
                 text-align: center;
                 transition: all 0.2s;
                 &:before,
@@ -42,7 +43,7 @@
             .bar {
                 position: relative;
                 margin: 60px auto 0;
-                height: 28px;
+                height: 34px;
                 border: solid 2px #413389;
                 background: linear-gradient(90deg, #009dc2, #7e5dd7);
                 .linear {
@@ -67,18 +68,18 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 30px;
             padding: 0 20px;
             color: #61ABFF;
             font-size: 20px;
             line-height: 30px;
             h4 {
                 font-weight: normal;
-                font-size: 16px;
+                font-size: 20px;
             }
             .value {
                 margin-top: 10px;
-                font-size: 30px;
+                font-size: 34px;
                 .unit {
                     font-size: 14px;
                 }
@@ -113,12 +114,9 @@
             <div class="goal_reach">
                 <div class="box">
                     <div class="bar">
-                        <div class="rate" :style="{left: targetComplete.occuRate}">
-                            {{targetComplete.occuRate}}
-                        </div>
+                        <div class="rate" :style="{left: setStyle(targetComplete.occuRate).left,width: setStyle(targetComplete.occuRate).width}">{{targetComplete.occuRate}}%</div>
                         <div class="linear"></div>
-                        <div class="cover"
-                             :style="{width: (100 - targetComplete.occuRate.substr(0,targetComplete.occuRate.length-1)) + '%'}"></div>
+                        <div class="cover" v-if="targetComplete.occuRate < 100" :style="{width: (100 - targetComplete.occuRate) + '%'}"></div>
                     </div>
                 </div>
                 <ul class="data">
@@ -170,6 +168,22 @@
         mounted() {
         },
         methods: {
+            setStyle(value){
+                let obj = {
+                    width: '100px'
+                };
+                if(value == 0){
+                    obj.left = '20px';
+                    obj.width = '80px';
+                }else if(value <= 5){
+                    obj.left = '20px';
+                }else if(value > 100){
+                    obj.left = '99%';
+                }else{
+                    obj.left = value + '%';
+                }
+                return obj;
+            },
             refreshTargetComplete() {
                 let me = this;
                 //调用api请求数据，没有则直接返回
@@ -181,7 +195,7 @@
                             target: (+data.targetAmount / 10000).toFixed(2),
                             atPresent: (+data.amount / 10000).toFixed(2),
                             increaseRate: data.targetRate,
-                            occuRate: parseFloat(+data.amount * 100 / +data.targetAmount).toFixed(2) + "%"
+                            occuRate: parseFloat(+data.amount * 100 / +data.targetAmount).toFixed(2)
                         };
                     }
                 });
