@@ -457,3 +457,5 @@ export function fixIpxFixed() {
         }
     }
 }
+
+export const refreshTime = 10;

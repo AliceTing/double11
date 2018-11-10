@@ -15,7 +15,7 @@ let ENV = process.env.NODE_ENV || 'development';
 let pre = process.env.pre;
 let test = process.env.test;
 let isDev = (ENV === 'development');
-//todo 修改成线上域名
+// let publicPath = '//localhost/';
 let publicPath = '//bi.laiyifen.com/realtime-dashboard/';
 
 let outPath = path.join(__dirname, 'target');

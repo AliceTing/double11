@@ -1,34 +1,29 @@
 <style lang="scss" scoped>
     .deal_order {
-        padding-bottom: 30px;
+        box-sizing: border-box;
+        padding: 0 20px;
+        border: solid 1px rgba(60, 46, 213, .54);
+        background-color: rgba(60, 46, 213, .14);
+        border-radius: 10px;
         color: #DCE2E9;
         font-size: 22px;
         .con {
-            display: flex;
-            flex-direction: column;
             position: relative;
-            height: 100%;
-            padding: 20px 40px;
-            box-sizing: border-box;
-            background-color: rgba(60, 46, 213, .14);
         }
         .main {
             flex: 1;
             overflow: hidden;
         }
-        .swiper_container{
-            height: 80px;
-        }
-        .name {
-            margin-bottom: 15px;
-            padding-left: 0;
+        .swiper_container {
+            height: 60px;
+            margin-top: 5px;
         }
         .item {
             display: flex;
             justify-content: space-between;
-            font-size: 22px;
-            height: 40px;
-            line-height: 40px;
+            font-size: 16px;
+            height: 30px;
+            line-height: 30px;
             overflow: hidden;
             box-sizing: border-box;
             .user {
@@ -44,8 +39,8 @@
         .bottom_blur {
             position: absolute;
             bottom: 0;
-            left: 20px;
-            right: 20px;
+            left: 0;
+            right: 0;
             z-index: 5;
             height: 60px;
             background: linear-gradient(transparent, #18115b);
@@ -53,9 +48,9 @@
     }
 </style>
 <template>
-    <div class="data_md deal_order" :style="{height: setMiddleSingleHeight*1/3 + 'px'}">
+    <div class="data_md deal_order" :style="{height: setMiddleSingleHeight*1/3 - 30 + 'px'}">
+        <h2 class="name">订单实时统计</h2>
         <div class="con">
-            <h2 class="name">成交订单</h2>
             <div class="main">
                 <div class="swiper_container">
                     <swiper :options="swiperOption" ref="mySwiper">
@@ -77,11 +72,16 @@
 </template>
 
 <script>
-    import Event from 'Public/util/event';
     import {mapState, mapActions, mapMutations} from 'vuex';
+
+    import Event from 'Public/util/event';
+    import {refreshTime} from 'Public/util';
+
     import echarts from 'echarts';
 
     import {swiper, swiperSlide} from "vue-awesome-swiper";
+
+    import Swiper from "vue-awesome-swiper";
 
     require("swiper/dist/css/swiper.css");
 
@@ -90,13 +90,15 @@
             swiper,
             swiperSlide
         },
-        props: {},
+        props: {
+            // setMiddleSingleHeight: ''
+        },
         data() {
             return {
                 refreshTime: 10,
                 swiperOption: {
                     direction: 'vertical',
-                    height: 80,
+                    height: 60,
                     autoplay: true,
                     loop: true,
                     slidesPerGroup: 1,
@@ -118,28 +120,27 @@
 
             // 标记闪亮的点
             Event.$on('highLight', function (index) {
-                console.log('index', index);
-                if (index == 0) {
-                    me.curIndex = index;
-                } else {
-                    me.curIndex = me.curSwiper.activeIndex;
-                }
+                me.curIndex = me.curSwiper.activeIndex;
 
-                let result = [],
+                let result = [], data = [],
                     val, lnglat;
 
                 let myChart = echarts.getInstanceByDom(document.getElementById("main3"));
                 let opts = myChart.getOption();
 
                 result = [];
-                val = me.transactionOrder.transOrderInfo[me.curIndex];
-                lnglat = val["position"].split(',');
-                if (lnglat.toString() != "0,0") {
-                    result.push({
-                        name: val["storename"],
-                        value: lnglat.concat(val["orderamount"])
-                    });
+                data = me.transactionOrder.transOrderInfo || [];
+                if (data.length > 0) {
+                    val = data[me.curIndex];
+                    lnglat = val["position"].split(',');
+                    if (lnglat.toString() != "0,0") {
+                        result.push({
+                            name: val["storename"],
+                            value: lnglat.concat(val["orderamount"])
+                        });
+                    }
                 }
+                myChart.clear();
                 opts.series[1].data = result;
                 myChart.setOption(opts);
 
@@ -164,13 +165,15 @@
                     //轮播还原位置
                     setTimeout(function () {
                         if (me.curSwiper) {
-                            me.curSwiper.slideTo(me.curIndex);
+                            me.curIndex = 0;
+                            me.curSwiper.slideToLoop(0);
+                            me.curSwiper.autoplay.start();
                         }
                     }, 20);
 
                     return refreshData;
                 };
-                setInterval(refreshData(), 1000 * me.refreshTime);
+                setInterval(refreshData(), 1000 * refreshTime);
             }
         },
         computed: {

@@ -3,18 +3,22 @@
 </style>
 <template>
     <div class="data_md" :style="{height: setMiddleSingleHeight + 'px'}">
-        <div id="main3" :style="{height: setMiddleSingleHeight - 50 + 'px'}"></div>
+        <div id="main3" :style="{height: setMiddleSingleHeight  + 'px'}"></div>
     </div>
 </template>
 
 <script>
-    import apis from '../api';
     import {mapState, mapActions, mapMutations} from 'vuex';
+    import {refreshTime} from 'Public/util';
+    import apis from '../api';
+
     import echarts from 'echarts';
     import 'echarts/map/js/china.js';
     export default {
         components: {},
-        props: {},
+        props: {
+            // setMiddleSingleHeight: ''
+        },
         data() {
             return {
                 refreshTime: 10
@@ -44,7 +48,6 @@
                     geo: {
                         map: "china",
                         label: {
-                            //show: true,
                             fontSize: 10
                         },
                         itemStyle: {
@@ -73,7 +76,10 @@
                         name: "最新",
                         type: "effectScatter",
                         coordinateSystem: "geo",
-                        symbolSize: 20,
+                        symbolSize: function (val) {
+                            let len = parseInt(val[2]).toString().length;
+                            return (val[2] / Math.pow(10, len)) + 20;
+                        },
                         label: {
                             normal: {
                                 formatter: "{b}",
@@ -116,7 +122,7 @@
                 apis.getOrderMap().then(data => {
                     if(data.code == 0){
                         data = data.result;
-                        allStore = data.orderMapInfos;
+                        allStore = data.orderMapInfos||[];
                         len = allStore.length;
                         for (; i < len; i++) {
                             val = allStore[i];
@@ -136,73 +142,6 @@
                 });
 
             },
-            transactionOrderMove() {
-                let me = this;
-                let area = document.getElementById('scrollBox');
-                let lHeight = 40;
-                let time = 50;
-                area.innerHTML += area.innerHTML;
-                area.scrollTop = 0;
-                let sh = 0;
-                let currentStore = me.transactionOrder;
-                let result = [],
-                    i = 0, len, val, lnglat;
-                let timer;
-
-                len = currentStore.length;
-
-                let myChart = echarts.getInstanceByDom(document.getElementById("main3"));
-                let opts = myChart.getOption();
-
-                let date=new Date();
-
-                let fn = {
-                    scrollMove: function () {
-
-                        if((new Date()-date)>8*1000){
-                            clearInterval(timer);
-                            return;
-                        }
-                        sh++;
-                        area.scrollTop = sh;
-                        timer = setInterval(fn.scrollUp, time);
-                    },
-                    scrollUp: function () {
-                        if (Math.ceil(area.scrollTop) % lHeight == 0) {//滚动一行后，延时2秒
-                            clearInterval(timer);
-                            fn.setMap();
-                            setTimeout(fn.scrollMove, 1000);
-                        } else {
-                            sh++;
-                            area.scrollTop = sh;
-                            if (area.scrollTop >= area.scrollHeight / 2) {    //判断滚动高度,当滚动高度大于area本身的高度时，使其回到原点重新滚动
-                                area.scrollTop = 0;
-                                sh = 0;
-                            }
-                        }
-                    },
-                    setMap: function () {
-                        result = [];
-                        for (; i < len;) {
-                            val = currentStore[i];
-                            lnglat = val["position"].split(',');
-                            if (lnglat.toString() != "0,0") {
-                                result.push({
-                                    name: val["storename"],
-                                    value: lnglat.concat(val["orderamount"])
-                                });
-                                i++;
-                                break;
-                            }
-                            i++;
-                        }
-                        if (i == len) i = 0;
-                        opts.series[1].data = result;
-                        myChart.setOption(opts);
-                    }
-                };
-                setTimeout(fn.scrollMove, 1000);//延迟2秒后执行scrollMove
-            },
             //定时刷新
             intervalData() {
                 let me = this;
@@ -211,7 +150,7 @@
 
                     return refreshData;
                 };
-                setInterval(refreshData(), 1000 * me.refreshTime);
+                setInterval(refreshData(), 1000 * refreshTime);
             }
         },
         computed: {

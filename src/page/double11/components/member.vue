@@ -7,21 +7,24 @@
              :style="{height: setSingleHeight + 'px'}">
             <h2 class="name">{{chartItem.name}}</h2>
             <div class="con">
-                <div class="chart" :style="{height: (setSingleHeight - 50) + 'px'}"
-                     :id="'main'+(index+4)"></div>
+                <div class="chart" :style="{height: (setSingleHeight-40) + 'px'}" :id="'main'+(index+4)"></div>
             </div>
         </div>
     </section>
 </template>
 
 <script>
-    import apis from '../api';
     import {mapState, mapActions, mapMutations} from 'vuex';
+    import apis from '../api';
+    import {refreshTime} from 'Public/util';
+
     import echarts from 'echarts';
 
     export default {
         components: {},
-        props: {},
+        props: {
+            // setSingleHeight: ''
+        },
         data() {
             return {
                 rightChartArr: [{
@@ -57,7 +60,7 @@
                 let opt = {
                     color: ["#009dc2", "#7e5dd7", "#5113b1", "#4702fb", "#0a84a1", "#7b4cf4"],
                     tooltip: {
-                        show: false,
+                        show: true,
                         trigger: "item"
                     },
                     legend: {
@@ -73,7 +76,7 @@
                         selectedMode: "multiple",
                         center: [
                             "50%",
-                            "40%"
+                            "50%"
                         ],
                         radius: [
                             "50%",
@@ -83,7 +86,7 @@
                             show: true,
                             position: 'outside',
                             formatter: "{b}:{d}%",
-                            fontSize: 24
+                            fontSize: 16
                         },
                         data: []
                     }
@@ -109,6 +112,9 @@
                             color: '#3D3E86'
                         }
                     },
+                    grid:{
+                        top: 80
+                    },
                     series: [
                         {
                             type: "pie",
@@ -121,7 +127,7 @@
                                 show: true,
                                 position: 'outside',
                                 formatter: "{b}:{d}%",
-                                fontSize: 24
+                                fontSize: 16
                             },
                             data: []
                         }
@@ -163,12 +169,12 @@
 
                     return refreshData;
                 };
-                setInterval(refreshData(), 1000 * me.refreshTime);
+                setInterval(refreshData(), 1000 * refreshTime);
             }
         },
         computed: {
             setSingleHeight() {
-                let innerBoxHeight = window.innerHeight - 90;
+                let innerBoxHeight = window.innerHeight - 60;
                 let singleHeight = Math.floor(parseInt((innerBoxHeight) / 3));
                 return singleHeight;
             }
