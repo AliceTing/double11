@@ -161,7 +161,7 @@
                         opts.series[1].data = actual;
                         opts.series[2].data = target;
                         opts.xAxis[0].data = province;
-                        myChart.clear();
+                        // myChart.clear();
                         myChart.setOption(opts);
                     }
                 });

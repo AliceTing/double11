@@ -136,7 +136,7 @@
                         }
                         opts.series[0].data = result;
 
-                        myChart.clear();
+                        // myChart.clear();
                         myChart.setOption(opts);
                     }
                 });

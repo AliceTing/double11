@@ -130,7 +130,7 @@
 
                         opts.series[0].data=val;
                         opts.xAxis[0].data=time;
-                        myChart.clear();
+                        // myChart.clear();
                         myChart.setOption(opts);
                     }
                 });

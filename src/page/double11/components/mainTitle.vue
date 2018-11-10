@@ -9,7 +9,7 @@
     .title {
         margin: 20px auto;
         background: url("../../../public/assets/images/title.png") no-repeat center top;
-        background-size: 697px 197px;
+        background-size: 100%;
         .real_time {
             padding-top: 60px;
             color: #fff;

@@ -112,7 +112,7 @@
                             color: '#69b7ff'
                         }
                     },
-                    grid:{
+                    grid: {
                         top: 80
                     },
                     series: [
@@ -142,13 +142,13 @@
                 let myChart, opts;
                 //调用api请求数据，没有则直接返回
                 apis.getMember().then(data => {
-                    if(data.code == 0){
+                    if (data.code == 0) {
                         data = data.result;
 
                         //会员等级main4
                         myChart = echarts.getInstanceByDom(document.getElementById("main4"));
                         opts = myChart.getOption();
-                        myChart.clear();
+                        //myChart.clear();
                         opts.series[0].data = data.memberLevel || [];
                         myChart.setOption(opts);
 
@@ -156,7 +156,7 @@
                         myChart = echarts.getInstanceByDom(document.getElementById("main5"));
                         opts = myChart.getOption();
                         opts.series[0].data = data.memberDistribute || [];
-                        myChart.clear();
+                        // myChart.clear();
                         myChart.setOption(opts);
                     }
                 });

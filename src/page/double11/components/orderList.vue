@@ -140,7 +140,7 @@
                         });
                     }
                 }
-                myChart.clear();
+                // myChart.clear();
                 opts.series[1].data = result;
                 myChart.setOption(opts);
 
