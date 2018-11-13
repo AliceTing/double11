@@ -147,9 +147,7 @@
     import {refreshTime} from 'Public/util';
     export default {
         components: {},
-        props: {
-            setSingleHeight: ''
-        },
+        props: {},
         data() {
             return {
                 targetComplete: {
@@ -213,11 +211,11 @@
             }
         },
         computed: {
-            // setSingleHeight() {
-            //     let innerBoxHeight = window.innerHeight - 60;
-            //     let singleHeight = Math.floor(parseInt((innerBoxHeight) / 3));
-            //     return singleHeight;
-            // },
+            setSingleHeight() {
+                let innerBoxHeight = window.innerHeight - 60;
+                let singleHeight = Math.floor(parseInt((innerBoxHeight) / 3));
+                return singleHeight;
+            },
         }
     }
 </script>

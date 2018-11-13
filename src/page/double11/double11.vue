@@ -76,20 +76,20 @@
     <div class="container">
         <div class="wrap left">
             <div class="inner">
-                <targetComplete :setSingleHeight="setSingleHeight"></targetComplete>
-                <businessRanking :setSingleHeight="setSingleHeight"></businessRanking>
-                <orderNumber :setSingleHeight="setSingleHeight"></orderNumber>
+                <targetComplete></targetComplete>
+                <businessRanking></businessRanking>
+                <orderNumber></orderNumber>
             </div>
         </div>
         <div class="wrap middle">
-            <mainTitle :setMiddleSingleHeight="setMiddleSingleHeight"></mainTitle>
-            <orderMap :setMiddleSingleHeight="setMiddleSingleHeight"></orderMap>
-            <orderList :setMiddleSingleHeight="setMiddleSingleHeight"></orderList>
+            <mainTitle></mainTitle>
+            <orderMap></orderMap>
+            <orderList></orderList>
         </div>
         <div class="wrap right">
             <div class="inner">
                 <member></member>
-                <salesAmount :setSingleHeight="setSingleHeight"></salesAmount>
+                <salesAmount></salesAmount>
             </div>
         </div>
     </div>
@@ -126,11 +126,6 @@
         created() {
         },
         mounted() {
-            let me = this;
-            me.clientHeight.height = `${document.documentElement.clientHeight}px`;
-            window.onresize = function temp() {
-                me.clientHeight = `${document.documentElement.clientHeight}px`;
-            };
         },
         methods: {},
         computed: {

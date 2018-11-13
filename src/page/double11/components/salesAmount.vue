@@ -84,7 +84,7 @@
                             },
                             rotate: 30,
                             formatter: function (val, index) {
-                                return (parseFloat(val) / 10000) + "W";
+                                return val;
                             }
                         }
                     }],

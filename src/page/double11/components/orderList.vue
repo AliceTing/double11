@@ -73,6 +73,7 @@
 
 <script>
     import {mapState, mapActions, mapMutations} from 'vuex';
+    import apis from '../api';
 
     import Event from 'Public/util/event';
     import {refreshTime} from 'Public/util';
@@ -81,8 +82,6 @@
 
     import {swiper, swiperSlide} from "vue-awesome-swiper";
 
-    import Swiper from "vue-awesome-swiper";
-
     require("swiper/dist/css/swiper.css");
 
     export default {
@@ -90,9 +89,7 @@
             swiper,
             swiperSlide
         },
-        props: {
-            // setMiddleSingleHeight: ''
-        },
+        props: {},
         data() {
             return {
                 refreshTime: 10,
@@ -109,12 +106,13 @@
                         }
                     }
                 },
-                curIndex: 0
+                curIndex: 0,
+                transactionOrder: {}
             }
         },
         created() {
             let me = this;
-            me.getTransactionOrder();
+
             // 定时刷新数据
             me.intervalData();
 
@@ -155,7 +153,11 @@
             refreshOrderList() {
                 let me = this;
                 //调用api请求数据，没有则直接返回
-                me.getTransactionOrder();
+                apis.getTransactionOrder().then(data => {
+                    if (data.code == 0) {
+                        me.transactionOrder = data.result || {};
+                    }
+                });
             },
             //定时刷新
             intervalData() {
@@ -178,7 +180,7 @@
         },
         computed: {
             ...mapState({
-                transactionOrder: state => state.double11Module.transactionOrder,
+                // transactionOrder: state => state.double11Module.transactionOrder,
             }),
             setMiddleSingleHeight() {
                 let innerBoxHeight = window.innerHeight;

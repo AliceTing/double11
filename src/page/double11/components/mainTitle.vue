@@ -145,9 +145,7 @@
 
     export default {
         components: {},
-        props: {
-            setMiddleSingleHeight: ''
-        },
+        props: {},
         data() {
             return {
                 realTime: '00:00:00',
@@ -191,14 +189,14 @@
                     amount, orderNum, userNum, avgPrice,
                     time = 1000 * 5;
 
-                var getNum = function (tar, des) {
+                let getNum = function (tar, des) {
                     let diff = parseInt(tar) - parseInt(des);
                     if (diff > 0) {
                         return Math.ceil(diff / (time / 300));
                     } else {
                         return Math.floor(diff / (time / 300));
                     }
-                }
+                };
                 //调用api请求数据，没有则直接返回
                 apis.getMainTitle().then(data => {
                     if (data.code == 0) {
@@ -267,76 +265,6 @@
                         }, 300);
                     }
                 });
-                //调用api请求数据，没有则直接返回
-                // me.getData({
-                //     action: 'getMainTitle',
-                //     fn(data) {
-                //         if (me.mainTitleInterval) {
-                //             clearInterval(me.mainTitleInterval);
-                //             me.mainTitleInterval=null;
-                //         }
-                //
-                //         amount = parseInt(me.mainInfo.amount || 0);
-                //         orderNum = parseInt(me.mainInfo.orderNum || 0);
-                //         userNum = parseInt(me.mainInfo.userNum || 0);
-                //         avgPrice = parseInt(me.mainInfo.avgPrice || 0);
-                //
-                //         numA = getNum(data.mainTitle.amount, amount);
-                //         numO = getNum(data.mainTitle.orderNum, orderNum);
-                //         numU = getNum(data.mainTitle.userNum, userNum);
-                //         numP = getNum(data.mainTitle.avgPrice, avgPrice);
-                //
-                //
-                //         me.mainTitleInterval = setInterval(function () {
-                //             count = 4;
-                //
-                //             amount += numA;
-                //             if (amount >= (+data.mainTitle.amount)) {
-                //                 amount = (+data.mainTitle.amount);
-                //                 count--;
-                //             }
-                //
-                //             orderNum += numO;
-                //             if (orderNum >= (+data.mainTitle.orderNum)) {
-                //                 orderNum = (+data.mainTitle.orderNum);
-                //                 count--;
-                //             }
-                //
-                //             userNum += numU;
-                //             if (userNum >= (+data.mainTitle.userNum)) {
-                //                 userNum = (+data.mainTitle.userNum);
-                //                 count--;
-                //             }
-                //
-                //             avgPrice += numP;
-                //             if (numP > 0) {
-                //                 if (avgPrice >= (+data.mainTitle.avgPrice)) {
-                //                     avgPrice = (+data.mainTitle.avgPrice);
-                //                     count--;
-                //                 }
-                //             } else {
-                //                 if (avgPrice <= (+data.mainTitle.avgPrice)) {
-                //                     avgPrice = (+data.mainTitle.avgPrice);
-                //                     count--;
-                //                 }
-                //             }
-                //
-                //
-                //             if (count == 0) {
-                //                 clearInterval(me.mainTitleInterval);
-                //             }
-                //
-                //             me.mainInfo = {
-                //                 amount: amount,
-                //                 orderNum: orderNum,
-                //                 userNum: userNum,
-                //                 avgPrice: avgPrice
-                //             };
-                //         }, 300);
-                //
-                //
-                //     }
-                // });
             },
             //定时刷新
             intervalData() {
@@ -351,11 +279,11 @@
             }
         },
         computed: {
-            // setMiddleSingleHeight() {
-            //     let innerBoxHeight = window.innerHeight;
-            //     let middleSingleHeight = Math.floor(parseInt((innerBoxHeight) / 2));
-            //     return middleSingleHeight;
-            // }
+            setMiddleSingleHeight() {
+                let innerBoxHeight = window.innerHeight;
+                let middleSingleHeight = Math.floor(parseInt((innerBoxHeight) / 2));
+                return middleSingleHeight;
+            }
         }
     }
 </script>

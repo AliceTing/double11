@@ -22,9 +22,7 @@
 
     export default {
         components: {},
-        props: {
-            // setSingleHeight: ''
-        },
+        props: {},
         data() {
             return {
                 rightChartArr: [{

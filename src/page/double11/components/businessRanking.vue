@@ -11,7 +11,6 @@
 </template>
 
 <script>
-    import Vue from 'vue';
     import {mapState, mapActions, mapMutations} from 'vuex';
     import apis from '../api';
     import {refreshTime} from 'Public/util';
@@ -20,9 +19,7 @@
 
     export default {
         components: {},
-        props: {
-            setSingleHeight: ''
-        },
+        props: {},
         data() {
             return {
                 refreshTime: 10
@@ -32,7 +29,9 @@
         },
         mounted() {
             let me = this;
-
+            me.businessRankingChart();
+            // 定时刷新数据
+            me.intervalData();
         },
         methods: {
             // 初始化图表
@@ -170,6 +169,7 @@
             intervalData() {
                 let me = this;
                 let refreshData = function () {
+
                     me.refreshBusinessRanking();
 
                     return refreshData;
@@ -178,20 +178,10 @@
             }
         },
         computed: {
-            // setSingleHeight() {
-            //     let innerBoxHeight = window.innerHeight - 60;
-            //     let singleHeight = Math.floor(parseInt((innerBoxHeight) / 3));
-            //     return singleHeight;
-            // }
-        },
-        watch: {
-            setSingleHeight(newValue, oldValue) {
-                let me = this;
-                Vue.nextTick(() => {
-                    me.businessRankingChart();
-                    //调接口set数据
-                    me.intervalData();
-                });
+            setSingleHeight() {
+                let innerBoxHeight = window.innerHeight - 60;
+                let singleHeight = Math.floor(parseInt((innerBoxHeight) / 3));
+                return singleHeight;
             }
         }
     }

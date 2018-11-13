@@ -16,9 +16,7 @@
     import 'echarts/map/js/china.js';
     export default {
         components: {},
-        props: {
-            // setMiddleSingleHeight: ''
-        },
+        props: {},
         data() {
             return {
                 refreshTime: 10
