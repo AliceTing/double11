@@ -1,26 +1,34 @@
 <style lang="scss" scoped>
 
-    .title,
+    .title_box,
     .real_time,
     .total_price {
         text-align: center;
     }
 
-    .title {
-        margin: 20px auto;
-        background: url("../../../public/assets/images/title.png") no-repeat center top;
-        background-size: auto;
+    .title_box {
+        margin: 10px auto 0;
+        background: url("../../../public/assets/images/group.png") no-repeat center top;
+        background-size: 100% 100%;
         .real_time {
-            padding-top: 60px;
             color: #fff;
+            font-size: 30px;
+        }
+    }
+
+    .title{
+        color: #7AC4FF;
+        font-size: 28px;
+        strong{
             font-size: 36px;
         }
     }
 
     .total_price {
         color: #FFFF6B;
-        font-size: 50px;
+        font-size: 80px;
         font-weight: 500;
+        line-height: 90px;
     }
 
     .detail_info {
@@ -118,7 +126,8 @@
 </style>
 <template>
     <div class="data_md" :style="{height: setMiddleSingleHeight*2/3 + 'px'}">
-        <div class="title">
+        <div class="title_box">
+            <div class="title">来伊份门店<br><strong>实时交易战报</strong></div>
             <div class="real_time">{{realTime}}</div>
             <div class="total_price">￥{{mainInfo.amount | parseFormatNum}}</div>
         </div>
